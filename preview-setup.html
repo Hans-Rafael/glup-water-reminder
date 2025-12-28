@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glup Water Reminder - Setup Personalizado</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .phone-container {
+            width: 375px;
+            height: 667px;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .status-bar {
+            height: 44px;
+            background: #2196F3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .screen {
+            height: calc(100% - 44px - 60px);
+            background: #f0f8ff;
+            position: relative;
+            overflow-y: auto;
+        }
+        
+        /* SETUP SCREEN */
+        .setup-screen {
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .setup-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2196F3;
+            margin-bottom: 10px;
+        }
+        
+        .setup-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #2196F3;
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+        }
+        
+        .recommendation-box {
+            background: #e3f2fd;
+            border: 2px solid #2196F3;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .recommendation-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2196F3;
+            margin-bottom: 5px;
+        }
+        
+        .recommendation-amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1976D2;
+            margin-bottom: 5px;
+        }
+        
+        .recommendation-note {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .setup-button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: background 0.2s;
+        }
+        
+        .setup-button:hover {
+            background: #1976D2;
+        }
+        
+        .setup-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        /* HOME SCREEN STYLES */
+        .home-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            height: 100%;
+        }
+        
+        .home-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2196F3;
+            margin-bottom: 20px;
+        }
+        
+        .user-info {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+        
+        .water-progress {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .progress-text {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .progress-bar {
+            width: 180px;
+            height: 12px;
+            background: #e0e0e0;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #2196F3;
+            width: 0%;
+            border-radius: 6px;
+            transition: width 0.5s ease;
+        }
+        
+        .glasses-text {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .glass-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .size-button {
+            width: 35px;
+            height: 35px;
+            border-radius: 18px;
+            background: #e3f2fd;
+            border: 2px solid #2196F3;
+            color: #2196F3;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .size-button:hover {
+            background: #2196F3;
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .glup-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .glup-button {
+            width: 80px;
+            height: 80px;
+            border-radius: 40px;
+            background: #2196F3;
+            border: none;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+            transition: all 0.1s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .glup-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .glup-emoji {
+            font-size: 24px;
+            margin-bottom: 3px;
+        }
+        
+        .glass-size-text {
+            font-size: 10px;
+            color: #666;
+            margin-top: 3px;
+            font-weight: 500;
+        }
+        
+        .motivation-text {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            max-width: 250px;
+        }
+        
+        .bottom-tabs {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 60px;
+            background: white;
+            display: flex;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .tab {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            color: #666;
+            font-size: 12px;
+            transition: color 0.2s ease;
+        }
+        
+        .tab.active {
+            color: #2196F3;
+        }
+        
+        .tab-icon {
+            font-size: 18px;
+            margin-bottom: 2px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .info-panel {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.95);
+            padding: 8px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            font-size: 11px;
+            max-width: 180px;
+        }
+        
+        .info-panel h4 {
+            color: #2196F3;
+            margin-bottom: 3px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="info-panel">
+        <h4>💧 Setup Personalizado</h4>
+        <p>• Completa tus datos para hidratación personalizada</p>
+        <p>• Basado en recomendaciones 2025</p>
+    </div>
+    
+    <div class="phone-container">
+        <div class="status-bar">
+            <span id="screen-title">Configuración Inicial</span>
+        </div>
+        
+        <div class="screen">
+            <!-- SETUP SCREEN -->
+            <div id="setup-content" class="setup-screen">
+                <h2 class="setup-title">¡Bienvenido a Glup! 💧</h2>
+                <p class="setup-subtitle">Personaliza tu hidratación basada en las recomendaciones de salud 2025</p>
+                
+                <div class="form-group">
+                    <label class="form-label">Sexo</label>
+                    <select class="form-select" id="gender" onchange="calculateRecommendation()">
+                        <option value="">Selecciona...</option>
+                        <option value="male">Hombre</option>
+                        <option value="female">Mujer</option>
+                        <option value="pregnant">Mujer embarazada/lactando</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Peso (kg)</label>
+                    <input type="number" class="form-input" id="weight" placeholder="70" min="30" max="200" onchange="calculateRecommendation()">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Nivel de actividad física</label>
+                    <select class="form-select" id="activity" onchange="calculateRecommendation()">
+                        <option value="low">Baja (sedentario)</option>
+                        <option value="moderate">Moderada (ejercicio ligero)</option>
+                        <option value="high">Alta (ejercicio intenso)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Clima donde vives</label>
+                    <select class="form-select" id="climate" onchange="calculateRecommendation()">
+                        <option value="temperate">Templado</option>
+                        <option value="hot">Caluroso/húmedo</option>
+                        <option value="cold">Frío</option>
+                    </select>
+                </div>
+                
+                <div class="recommendation-box" id="recommendation" style="display: none;">
+                    <div class="recommendation-title">Tu recomendación personalizada:</div>
+                    <div class="recommendation-amount" id="recommended-amount">2.5L</div>
+                    <div class="recommendation-note" id="recommendation-note">Basado en tu perfil personal</div>
+                </div>
+                
+                <button class="setup-button" id="complete-setup" onclick="completeSetup()" disabled>
+                    Comenzar mi hidratación personalizada
+                </button>
+            </div>
+            
+            <!-- HOME SCREEN -->
+            <div id="home-content" class="home-screen hidden">
+                <div class="user-info" id="user-info">
+                    Hombre, 70kg - Meta personalizada
+                </div>
+                
+                <h2 class="home-title">Hidratación Diaria</h2>
+                
+                <div class="water-progress">
+                    <div class="progress-text" id="progress-text">0.0L / 2.5L</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="glasses-text" id="glasses-text">0 / 12 vasos</div>
+                </div>
+                
+                <div class="glass-controls">
+                    <button class="size-button" onclick="adjustGlassSize(-0.05)">-</button>
+                    
+                    <div class="glup-container">
+                        <button class="glup-button" onclick="drinkWater()">
+                            <span class="glup-emoji">🥤</span>
+                            GLUP!
+                        </button>
+                        <div class="glass-size-text" id="glass-size-text">200ml</div>
+                    </div>
+                    
+                    <button class="size-button" onclick="adjustGlassSize(0.05)">+</button>
+                </div>
+                
+                <div class="motivation-text" id="motivation-text">
+                    ¡Comienza tu día hidratándote!
+                </div>
+            </div>
+        </div>
+        
+        <div class="bottom-tabs">
+            <div class="tab active" onclick="showScreen('home')">
+                <div class="tab-icon">🏠</div>
+                <div>Home</div>
+            </div>
+            <div class="tab" onclick="showScreen('historial')">
+                <div class="tab-icon">📊</div>
+                <div>Historial</div>
+            </div>
+            <div class="tab" onclick="showScreen('settings')">
+                <div class="tab-icon">⚙️</div>
+                <div>Settings</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let userProfile = null;
+        let glassesConsumed = 0;
+        let currentGlassSize = 0.2;
+        let dailyGoal = 2.5; // Default
+        let isSetupComplete = false;
+        
+        function calculateRecommendation() {
+            const gender = document.getElementById('gender').value;
+            const weight = parseFloat(document.getElementById('weight').value);
+            const activity = document.getElementById('activity').value;
+            const climate = document.getElementById('climate').value;
+            
+            if (!gender || !weight) {
+                document.getElementById('recommendation').style.display = 'none';
+                document.getElementById('complete-setup').disabled = true;
+                return;
+            }
+            
+            let baseAmount = 0;
+            
+            // Cálculo base por peso (35ml por kg)
+            baseAmount = weight * 0.035;
+            
+            // Ajuste por sexo según recomendaciones 2025
+            if (gender === 'male') {
+                baseAmount = Math.max(baseAmount, 2.5); // Mínimo 2.5L para hombres
+                baseAmount = Math.min(baseAmount, 3.7); // Máximo 3.7L
+            } else if (gender === 'female') {
+                baseAmount = Math.max(baseAmount, 2.0); // Mínimo 2.0L para mujeres
+                baseAmount = Math.min(baseAmount, 2.7); // Máximo 2.7L
+            } else if (gender === 'pregnant') {
+                baseAmount = Math.max(baseAmount, 3.0); // Mínimo 3.0L embarazadas/lactando
+            }
+            
+            // Ajuste por actividad física
+            if (activity === 'moderate') {
+                baseAmount += 0.5;
+            } else if (activity === 'high') {
+                baseAmount += 1.0;
+            }
+            
+            // Ajuste por clima
+            if (climate === 'hot') {
+                baseAmount += 0.5;
+            } else if (climate === 'cold') {
+                baseAmount -= 0.2;
+            }
+            
+            // Redondear a 0.1L
+            baseAmount = Math.round(baseAmount * 10) / 10;
+            
+            // Mostrar recomendación
+            document.getElementById('recommended-amount').textContent = baseAmount + 'L';
+            document.getElementById('recommendation-note').textContent = 
+                `Fórmula: ${weight}kg × 35ml + ajustes por actividad y clima`;
+            document.getElementById('recommendation').style.display = 'block';
+            document.getElementById('complete-setup').disabled = false;
+            
+            // Guardar para usar después
+            dailyGoal = baseAmount;
+        }
+        
+        function completeSetup() {
+            const gender = document.getElementById('gender').value;
+            const weight = document.getElementById('weight').value;
+            
+            userProfile = {
+                gender: gender,
+                weight: weight,
+                dailyGoal: dailyGoal
+            };
+            
+            // Actualizar info del usuario
+            const genderText = gender === 'male' ? 'Hombre' : gender === 'female' ? 'Mujer' : 'Mujer embarazada';
+            document.getElementById('user-info').textContent = 
+                `${genderText}, ${weight}kg - Meta: ${dailyGoal}L`;
+            
+            // Cambiar a pantalla home
+            document.getElementById('setup-content').classList.add('hidden');
+            document.getElementById('home-content').classList.remove('hidden');
+            document.getElementById('screen-title').textContent = 'Inicio';
+            
+            isSetupComplete = true;
+            updateProgress();
+            updateGlassDisplay();
+        }
+        
+        function showScreen(screen) {
+            if (!isSetupComplete && screen !== 'home') return;
+            
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            const screenTitle = document.getElementById('screen-title');
+            
+            switch(screen) {
+                case 'home':
+                    if (!isSetupComplete) {
+                        document.getElementById('setup-content').classList.remove('hidden');
+                        document.getElementById('home-content').classList.add('hidden');
+                        screenTitle.textContent = 'Configuración Inicial';
+                    } else {
+                        document.getElementById('setup-content').classList.add('hidden');
+                        document.getElementById('home-content').classList.remove('hidden');
+                        screenTitle.textContent = 'Inicio';
+                    }
+                    break;
+            }
+        }
+        
+        function drinkWater() {
+            if (!isSetupComplete) return;
+            
+            glassesConsumed++;
+            updateProgress();
+            
+            const button = document.querySelector('.glup-button');
+            button.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                button.style.transform = 'scale(1)';
+            }, 100);
+            
+            // Mostrar cantidad bebida
+            const glassText = document.getElementById('glass-size-text');
+            const originalText = glassText.textContent;
+            glassText.textContent = `+${Math.round(currentGlassSize * 1000)}ml`;
+            glassText.style.color = '#4CAF50';
+            glassText.style.fontWeight = 'bold';
+            
+            setTimeout(() => {
+                glassText.textContent = originalText;
+                glassText.style.color = '#666';
+                glassText.style.fontWeight = '500';
+            }, 1000);
+            
+            const litersConsumed = glassesConsumed * currentGlassSize;
+            if (litersConsumed >= dailyGoal) {
+                setTimeout(() => {
+                    alert('¡Felicidades! ¡Has completado tu meta personalizada! 🎉💧');
+                }, 200);
+            }
+        }
+        
+        function adjustGlassSize(change) {
+            if (!isSetupComplete) return;
+            
+            currentGlassSize = Math.max(0.05, Math.min(0.5, currentGlassSize + change));
+            updateGlassDisplay();
+            
+            const buttons = document.querySelectorAll('.size-button');
+            const button = change > 0 ? buttons[1] : buttons[0];
+            button.style.transform = 'scale(0.8)';
+            setTimeout(() => {
+                button.style.transform = 'scale(1)';
+            }, 100);
+        }
+        
+        function updateGlassDisplay() {
+            const glassText = document.getElementById('glass-size-text');
+            glassText.textContent = `${Math.round(currentGlassSize * 1000)}ml`;
+            updateProgress();
+        }
+        
+        function updateProgress() {
+            if (!isSetupComplete) return;
+            
+            const litersConsumed = (glassesConsumed * currentGlassSize).toFixed(1);
+            const progressPercentage = (parseFloat(litersConsumed) / dailyGoal) * 100;
+            const glassesNeeded = Math.ceil(dailyGoal / currentGlassSize);
+            
+            document.getElementById('progress-text').textContent = `${litersConsumed}L / ${dailyGoal}L`;
+            document.getElementById('progress-fill').style.width = `${Math.min(progressPercentage, 100)}%`;
+            document.getElementById('glasses-text').textContent = `${glassesConsumed} / ${glassesNeeded} vasos`;
+            
+            const motivationText = document.getElementById('motivation-text');
+            if (glassesConsumed === 0) {
+                motivationText.textContent = '¡Comienza tu día con tu meta personalizada!';
+            } else if (parseFloat(litersConsumed) >= dailyGoal) {
+                motivationText.textContent = '¡Meta personalizada completada! 🎉';
+            } else {
+                const remaining = (dailyGoal - parseFloat(litersConsumed)).toFixed(1);
+                motivationText.textContent = `¡Vas genial! Te faltan ${remaining}L`;
+            }
+        }
+        
+        // Initialize
+        updateProgress();
+        updateGlassDisplay();
+    </script>
+</body>
+</html>
