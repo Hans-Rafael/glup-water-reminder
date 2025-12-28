@@ -1,0 +1,2051 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glup Water Reminder - Historial Completo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .phone-container {
+            width: 375px;
+            height: 667px;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .status-bar {
+            height: 44px;
+            background: #2196F3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .screen {
+            height: calc(100% - 44px - 60px);
+            background: #f0f8ff;
+            position: relative;
+            overflow-y: auto;
+        }
+        
+        /* HOME SCREEN */
+        .home-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            height: 100%;
+        }
+        
+        .home-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2196F3;
+            margin-bottom: 40px;
+        }
+        
+        .water-progress {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .progress-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .progress-bar {
+            width: 250px;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #2196F3;
+            width: 0%;
+            border-radius: 6px;
+            transition: width 0.5s ease;
+        }
+        
+        .glasses-text {
+            font-size: 16px;
+            color: #666;
+        }
+        
+        .glass-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .size-button {
+            width: 35px;
+            height: 35px;
+            border-radius: 18px;
+            background: #e3f2fd;
+            border: 2px solid #2196F3;
+            color: #2196F3;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .size-button:hover {
+            background: #2196F3;
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .glup-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .glup-button {
+            width: 120px;
+            height: 120px;
+            border-radius: 60px;
+            background: #2196F3;
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+            transition: all 0.1s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .glup-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .glup-emoji {
+            font-size: 40px;
+            margin-bottom: 5px;
+        }
+        
+        .glass-size-text {
+            font-size: 10px;
+            color: #666;
+            margin-top: 3px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .glass-size-text.size-feedback {
+            font-size: 16px;
+            font-weight: bold;
+            transform: scale(1.2);
+        }
+        
+        .glass-size-text.plus-feedback {
+            color: #2196F3;
+        }
+        
+        .glass-size-text.minus-feedback {
+            color: #f44336;
+        }
+        
+        .motivation-text {
+            font-size: 16px;
+            color: #666;
+            text-align: center;
+            max-width: 300px;
+        }
+        
+        /* HISTORIAL SCREEN */
+        .historial-screen {
+            padding: 15px;
+            height: 100%;
+            overflow-y: auto;
+        }
+        
+        .historial-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2196F3;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .period-selector {
+            display: flex;
+            background: #f0f0f0;
+            border-radius: 8px;
+            padding: 3px;
+            margin-bottom: 15px;
+        }
+        
+        .period-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .period-btn.active {
+            background: #2196F3;
+            color: white;
+        }
+        
+        .daily-summary {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .summary-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .summary-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2196F3;
+        }
+        
+        .goal-status {
+            text-align: center;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+        
+        .goal-achieved {
+            background: #e8f5e8;
+            color: #4caf50;
+        }
+        
+        .goal-pending {
+            background: #fff3e0;
+            color: #ff9800;
+        }
+        
+        /* GRÁFICO DE HORARIOS */
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .chart-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .chart {
+            height: 120px;
+            position: relative;
+            background: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .chart-hours {
+            display: flex;
+            height: 100%;
+            align-items: end;
+            padding: 5px;
+            gap: 2px;
+        }
+        
+        .hour-bar {
+            flex: 1;
+            background: #e0e0e0;
+            border-radius: 2px 2px 0 0;
+            position: relative;
+            min-height: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .hour-bar.active {
+            background: #2196F3;
+        }
+        
+        .hour-bar:hover::after {
+            content: attr(data-info);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 4px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            white-space: nowrap;
+            z-index: 10;
+        }
+        
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 8px;
+            font-size: 10px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .legend-color {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+        }
+        
+        .chart-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 10px;
+            color: #666;
+        }
+        
+        /* LISTA DE BEBIDAS */
+        .drinks-container {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .drinks-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .clear-all-btn {
+            background: #ff5722;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        
+        .drink-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .drink-item:last-child {
+            border-bottom: none;
+        }
+        
+        .drink-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .drink-time {
+            font-size: 12px;
+            color: #666;
+            min-width: 45px;
+        }
+        
+        .drink-amount {
+            font-size: 12px;
+            font-weight: bold;
+            color: #2196F3;
+            background: #e3f2fd;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .delete-btn {
+            background: #ff5722;
+            color: white;
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 10px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .delete-btn:hover {
+            background: #d32f2f;
+        }
+        
+        .no-drinks {
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            padding: 20px;
+        }
+        
+        /* SETTINGS STYLES */
+        .settings-section {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        .form-input, .form-select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #2196F3;
+        }
+        
+        .form-select {
+            background: white;
+        }
+        
+        .settings-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .save-settings-btn {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .save-settings-btn:hover {
+            background: #1976D2;
+        }
+        
+        .reset-settings-btn {
+            background: #ff5722;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .reset-settings-btn:hover {
+            background: #d32f2f;
+        }
+        
+        .bottom-tabs {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 60px;
+            background: white;
+            display: flex;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .tab {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            color: #666;
+            font-size: 12px;
+            transition: color 0.2s ease;
+        }
+        
+        .tab.active {
+            color: #2196F3;
+        }
+        
+        .tab-icon {
+            font-size: 18px;
+            margin-bottom: 2px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .info-panel {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.95);
+            padding: 8px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            font-size: 11px;
+            max-width: 180px;
+        }
+        
+        .info-panel h4 {
+            color: #2196F3;
+            margin-bottom: 3px;
+            font-size: 12px;
+        }
+        
+        /* REMINDER NOTIFICATION */
+        .reminder-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #2196F3, #21CBF3);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
+            z-index: 1000;
+            max-width: 280px;
+            animation: slideIn 0.5s ease;
+        }
+        
+        .reminder-notification.hidden {
+            display: none;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .reminder-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .reminder-title {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .reminder-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .reminder-message {
+            font-size: 12px;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .reminder-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .reminder-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .reminder-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .reminder-btn.primary {
+            background: rgba(255,255,255,0.9);
+            color: #2196F3;
+        }
+        
+        /* CONGRATULATIONS SCREEN */
+        .congratulations-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        
+        .congratulations-overlay.hidden {
+            display: none;
+        }
+        
+        .congratulations-card {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 320px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            animation: celebrationPop 0.6s ease;
+        }
+        
+        @keyframes celebrationPop {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .congratulations-emoji {
+            font-size: 60px;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        .congratulations-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .congratulations-message {
+            font-size: 16px;
+            line-height: 1.4;
+            margin-bottom: 25px;
+        }
+        
+        .congratulations-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .congratulations-btn:hover {
+            background: white;
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="info-panel">
+        <h4>📊 Historial Completo</h4>
+        <p>• Gráfico de horarios de hidratación</p>
+        <p>• Lista de bebidas con opción borrar</p>
+        <p>• Progreso diario detallado</p>
+    </div>
+    
+    <div class="phone-container">
+        <div class="status-bar">
+            <span id="screen-title">Inicio</span>
+        </div>
+        
+        <!-- REMINDER NOTIFICATION -->
+        <div id="reminder-notification" class="reminder-notification hidden">
+            <div class="reminder-header">
+                <div class="reminder-title">💧 ¡Hora de hidratarte!</div>
+                <button class="reminder-close" onclick="closeReminder()">×</button>
+            </div>
+            <div class="reminder-message" id="reminder-message">
+                Es momento de beber agua. ¡Tu cuerpo te lo agradecerá!
+            </div>
+            <div class="reminder-actions">
+                <button class="reminder-btn" onclick="snoozeReminder()">Recordar en 10 min</button>
+                <button class="reminder-btn primary" onclick="drinkFromReminder()">Ya bebí agua</button>
+            </div>
+        </div>
+        
+        <!-- CONGRATULATIONS SCREEN -->
+        <div id="congratulations-overlay" class="congratulations-overlay hidden">
+            <div class="congratulations-card">
+                <div class="congratulations-emoji">🎉</div>
+                <div class="congratulations-title">¡Felicitaciones!</div>
+                <div class="congratulations-message" id="congratulations-message">
+                    ¡Has completado tu meta diaria de hidratación! Tu cuerpo te lo agradece.
+                </div>
+                <button class="congratulations-btn" onclick="closeCongratulations()">¡Genial!</button>
+            </div>
+        </div>
+        
+        <div class="screen">
+            <!-- HOME SCREEN -->
+            <div id="home-content" class="home-screen">
+                <h2 class="home-title">Hidratación Diaria</h2>
+                
+                <div class="water-progress">
+                    <div class="progress-text" id="progress-text">0.0L / 2.5L</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="glasses-text" id="glasses-text">0 / 12 vasos</div>
+                </div>
+                
+                <div class="glass-controls">
+                    <button class="size-button" onclick="adjustGlassSize(-0.05)">-</button>
+                    
+                    <div class="glup-container">
+                        <button class="glup-button" onclick="drinkWater()">
+                            <span class="glup-emoji">🥤</span>
+                            GLUP!
+                        </button>
+                        <div class="glass-size-text" id="glass-size-text">200ml</div>
+                    </div>
+                    
+                    <button class="size-button" onclick="adjustGlassSize(0.05)">+</button>
+                </div>
+                
+                <div class="motivation-text" id="motivation-text">
+                    ¡Comienza tu día hidratándote!
+                </div>
+            </div>
+            
+            <!-- HISTORIAL SCREEN -->
+            <div id="historial-content" class="historial-screen hidden">
+                <h2 class="historial-title">Historial</h2>
+                
+                <!-- Selector de período -->
+                <div class="period-selector">
+                    <button class="period-btn active" onclick="switchPeriod('today')">Hoy</button>
+                    <button class="period-btn" onclick="switchPeriod('week')">Última semana</button>
+                </div>
+                
+                <!-- Resumen diario -->
+                <div class="daily-summary">
+                    <div class="summary-row">
+                        <span class="summary-label">Total consumido:</span>
+                        <span class="summary-value" id="total-consumed">0.0L</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Meta diaria:</span>
+                        <span class="summary-value" id="daily-target">2.5L</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Progreso:</span>
+                        <span class="summary-value" id="progress-percentage">0%</span>
+                    </div>
+                    <div class="goal-status" id="goal-status">
+                        🎯 Te faltan 2.5L para completar tu meta
+                    </div>
+                </div>
+                
+                <!-- Gráfico de horarios -->
+                <div class="chart-container">
+                    <div class="chart-title" id="chart-title">📈 Hidratación por horas</div>
+                    <div class="chart">
+                        <div class="chart-hours" id="chart-hours">
+                            <!-- Se genera dinámicamente -->
+                        </div>
+                    </div>
+                    <div class="chart-labels" id="chart-labels">
+                        <span>6AM</span>
+                        <span>12PM</span>
+                        <span>6PM</span>
+                        <span>12AM</span>
+                    </div>
+                    <div class="chart-legend" id="chart-legend">
+                        <!-- Se genera dinámicamente -->
+                    </div>
+                </div>
+                
+                <!-- Lista de bebidas -->
+                <div class="drinks-container">
+                    <div class="drinks-title">
+                        🥤 Últimas bebidas
+                        <button class="clear-all-btn" onclick="clearAllDrinks()">Limpiar todo</button>
+                    </div>
+                    <div id="drinks-list">
+                        <div class="no-drinks">No has bebido agua hoy. ¡Comienza ahora!</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SETTINGS SCREEN -->
+            <div id="settings-content" class="historial-screen hidden">
+                <h2 class="historial-title">Configuración</h2>
+                
+                <!-- Información personal -->
+                <div class="settings-section">
+                    <h3 class="section-title">👤 Información Personal</h3>
+                    <div class="form-group">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" class="form-input" id="user-name" placeholder="Tu nombre" maxlength="20">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Sexo</label>
+                        <select class="form-select" id="user-gender">
+                            <option value="male">Hombre</option>
+                            <option value="female">Mujer</option>
+                            <option value="pregnant">Mujer embarazada/lactando</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Peso (kg)</label>
+                        <input type="number" class="form-input" id="user-weight" placeholder="70" min="30" max="200">
+                    </div>
+                </div>
+                
+                <!-- Preferencias de hidratación -->
+                <div class="settings-section">
+                    <h3 class="section-title">💧 Hidratación</h3>
+                    <div class="form-group">
+                        <label class="form-label">Meta diaria (litros)</label>
+                        <input type="number" class="form-input" id="daily-goal-setting" placeholder="2.5" step="0.1" min="1" max="5">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Nivel de actividad</label>
+                        <select class="form-select" id="activity-level">
+                            <option value="low">Baja (sedentario)</option>
+                            <option value="moderate">Moderada (ejercicio ligero)</option>
+                            <option value="high">Alta (ejercicio intenso)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Preferencias de recordatorios -->
+                <div class="settings-section">
+                    <h3 class="section-title">⏰ Recordatorios</h3>
+                    <div class="form-group">
+                        <label class="form-label">Activar recordatorios</label>
+                        <select class="form-select" id="reminder-enabled">
+                            <option value="true">Activado</option>
+                            <option value="false">Pausado</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Hora de despertar</label>
+                        <input type="time" class="form-input" id="wake-time">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Hora de dormir</label>
+                        <input type="time" class="form-input" id="sleep-time">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Sonido al beber agua</label>
+                        <select class="form-select" id="sound-enabled">
+                            <option value="true">Activado</option>
+                            <option value="false">Desactivado</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tipo de sonido</label>
+                        <select class="form-select" id="sound-type" onchange="testSelectedSound()">
+                            <option value="glup">🥤 Glup clásico</option>
+                            <option value="drop">💧 Gota de agua</option>
+                            <option value="bubble">🫧 Burbuja</option>
+                        </select>
+                        <button type="button" onclick="testSelectedSound()" style="margin-top: 8px; padding: 6px 12px; background: #e3f2fd; border: 1px solid #2196F3; border-radius: 4px; color: #2196F3; font-size: 12px; cursor: pointer;">🔊 Probar sonido</button>
+                    </div>
+                </div>
+                
+                <!-- Preferencias de visualización -->
+                <div class="settings-section">
+                    <h3 class="section-title">🎨 Visualización</h3>
+                    <div class="form-group">
+                        <label class="form-label">Unidad para progreso diario</label>
+                        <select class="form-select" id="progress-unit">
+                            <option value="l">Litros (2.5L / 2.5L)</option>
+                            <option value="ml">Mililitros (2500ml / 2500ml)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Unidad para tamaño del vaso</label>
+                        <select class="form-select" id="glass-unit">
+                            <option value="ml">Mililitros (250ml)</option>
+                            <option value="l">Litros (0.25L)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Idioma</label>
+                        <select class="form-select" id="language-preference">
+                            <option value="es">Español</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Botones de acción -->
+                <div class="settings-actions">
+                    <button class="save-settings-btn" onclick="saveAllSettings()">💾 Guardar cambios</button>
+                    <button class="reset-settings-btn" onclick="resetSettings()">🔄 Restaurar por defecto</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bottom-tabs">
+            <div class="tab active" onclick="showScreen('home')">
+                <div class="tab-icon">🏠</div>
+                <div>Home</div>
+            </div>
+            <div class="tab" onclick="showScreen('historial')">
+                <div class="tab-icon">📊</div>
+                <div>Historial</div>
+            </div>
+            <div class="tab" onclick="showScreen('settings')">
+                <div class="tab-icon">⚙️</div>
+                <div>Settings</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let glassesConsumed = 0;
+        let currentGlassSize = 0.2;
+        let dailyGoal = 2.5;
+        let drinkHistory = [];
+        let hourlyData = new Array(24).fill(0);
+        let currentPeriod = 'today';
+        let weeklyData = generateWeeklyData();
+        
+        // Configuraciones del usuario
+        let userSettings = {
+            name: '',
+            gender: 'male',
+            weight: 70,
+            dailyGoal: 2.5,
+            activityLevel: 'low',
+            progressUnit: 'l', // 'ml' o 'l' - para progreso diario
+            glassUnit: 'ml', // 'ml' o 'l' - para tamaño del vaso
+            language: 'es', // 'es' o 'en'
+            wakeTime: '07:00',
+            sleepTime: '22:00',
+            reminderEnabled: true,
+            soundEnabled: true,
+            soundType: 'glup' // 'glup', 'drop', 'bubble'
+        };
+        
+        let reminderTimer = null;
+        let lastReminderTime = null;
+        let goalCompletedToday = false;
+        
+        // Traducciones
+        const translations = {
+            es: {
+                home: 'Inicio',
+                historial: 'Historial',
+                settings: 'Configuración',
+                dailyHydration: 'Hidratación Diaria',
+                glasses: 'vasos',
+                startDay: 'Comienza tu día hidratándote',
+                excellent: 'Excelente',
+                goalCompleted: 'Meta completada',
+                youreGreat: 'Vas genial',
+                remaining: 'Te faltan',
+                hello: 'Hola',
+                friend: 'amigo',
+                personalInfo: '👤 Información Personal',
+                hydration: '💧 Hidratación',
+                visualization: '🎨 Visualización',
+                name: 'Nombre',
+                weight: 'Peso (kg)',
+                dailyGoal: 'Meta diaria (litros)',
+                progressUnit: 'Unidad para progreso diario',
+                glassUnit: 'Unidad para tamaño del vaso',
+                language: 'Idioma',
+                saveChanges: '💾 Guardar cambios',
+                restoreDefault: '🔄 Restaurar por defecto',
+                configSaved: '¡Configuración guardada exitosamente!',
+                omsWarning: '⚠️ Configuración guardada.\n\nRecuerda: La cantidad recomendada por la OMS es:\n• Hombres: 2.5-3.7L diarios\n• Mujeres: 2.0-2.7L diarios\n• Embarazadas/lactando: 3.0L+ diarios\n\nConsulta a tu médico para una recomendación personalizada.',
+                // Historial
+                totalConsumed: 'Total consumido:',
+                dailyTarget: 'Meta diaria:',
+                progress: 'Progreso:',
+                goalAchieved: '🎉 ¡Meta diaria completada!',
+                goalPending: '🎯 Te faltan',
+                toComplete: 'para completar tu meta',
+                hydrationByHours: '📈 Hidratación por horas',
+                weeklyProgress: '📈 Progreso semanal',
+                lastDrinks: '🥤 Últimas bebidas',
+                clearAll: 'Limpiar todo',
+                noDrinks: 'No has bebido agua hoy. ¡Comienza ahora!',
+                today: 'Hoy',
+                lastWeek: 'Última semana',
+                daysCompleted: 'días completados',
+                average: 'Promedio'
+            },
+            en: {
+                home: 'Home',
+                historial: 'History',
+                settings: 'Settings',
+                dailyHydration: 'Daily Hydration',
+                glasses: 'glasses',
+                startDay: 'Start your day by hydrating',
+                excellent: 'Excellent',
+                goalCompleted: 'Goal completed',
+                youreGreat: 'You\'re doing great',
+                remaining: 'You need',
+                hello: 'Hello',
+                friend: 'friend',
+                personalInfo: '👤 Personal Information',
+                hydration: '💧 Hydration',
+                visualization: '🎨 Display',
+                name: 'Name',
+                weight: 'Weight (kg)',
+                dailyGoal: 'Daily goal (liters)',
+                progressUnit: 'Unit for daily progress',
+                glassUnit: 'Unit for glass size',
+                language: 'Language',
+                saveChanges: '💾 Save changes',
+                restoreDefault: '🔄 Restore defaults',
+                configSaved: 'Settings saved successfully!',
+                omsWarning: '⚠️ Settings saved.\n\nRemember: WHO recommended amount is:\n• Men: 2.5-3.7L daily\n• Women: 2.0-2.7L daily\n• Pregnant/breastfeeding: 3.0L+ daily\n\nConsult your doctor for personalized recommendations.',
+                // Historial
+                totalConsumed: 'Total consumed:',
+                dailyTarget: 'Daily target:',
+                progress: 'Progress:',
+                goalAchieved: '🎉 Daily goal completed!',
+                goalPending: '🎯 You need',
+                toComplete: 'to complete your goal',
+                hydrationByHours: '📈 Hydration by hours',
+                weeklyProgress: '📈 Weekly progress',
+                lastDrinks: '🥤 Recent drinks',
+                clearAll: 'Clear all',
+                noDrinks: 'You haven\'t drunk water today. Start now!',
+                today: 'Today',
+                lastWeek: 'Last week',
+                daysCompleted: 'days completed',
+                average: 'Average'
+            }
+        };
+        
+        function showScreen(screen) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            document.querySelectorAll('[id$="-content"]').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            const screenTitle = document.getElementById('screen-title');
+            
+            switch(screen) {
+                case 'home':
+                    document.getElementById('home-content').classList.remove('hidden');
+                    screenTitle.textContent = 'Inicio';
+                    break;
+                case 'historial':
+                    document.getElementById('historial-content').classList.remove('hidden');
+                    screenTitle.textContent = 'Historial';
+                    updateHistorial();
+                    break;
+                case 'settings':
+                    document.getElementById('settings-content').classList.remove('hidden');
+                    screenTitle.textContent = 'Configuración';
+                    loadSettingsForm();
+                    break;
+            }
+        }
+        
+        function drinkWater() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'});
+            const hour = now.getHours();
+            
+            // Agregar a historial
+            const drinkId = Date.now();
+            drinkHistory.unshift({
+                id: drinkId,
+                time: timeString,
+                amount: currentGlassSize,
+                hour: hour
+            });
+            
+            // Actualizar datos por hora
+            hourlyData[hour] += currentGlassSize;
+            
+            glassesConsumed++;
+            updateProgress();
+            
+            // Reproducir sonido "glup"
+            playGlupSound();
+            
+            // Animación del botón
+            const button = document.querySelector('.glup-button');
+            button.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                button.style.transform = 'scale(1)';
+            }, 100);
+            
+            // Feedback visual
+            const glassText = document.getElementById('glass-size-text');
+            const originalText = glassText.textContent;
+            glassText.textContent = `+${Math.round(currentGlassSize * 1000)}ml`;
+            glassText.style.color = '#4CAF50';
+            glassText.style.fontWeight = 'bold';
+            
+            setTimeout(() => {
+                glassText.textContent = originalText;
+                glassText.style.color = '#666';
+                glassText.style.fontWeight = '500';
+            }, 1000);
+            
+            // Verificar meta
+            const totalConsumed = drinkHistory.reduce((sum, drink) => sum + drink.amount, 0);
+            if (totalConsumed >= dailyGoal && !goalCompletedToday) {
+                goalCompletedToday = true;
+                setTimeout(() => {
+                    showCongratulations();
+                }, 500);
+            }
+        }
+        
+        function adjustGlassSize(change) {
+            currentGlassSize = Math.max(0.05, Math.min(0.5, currentGlassSize + change));
+            updateGlassDisplay();
+            
+            // Animación del botón
+            const buttons = document.querySelectorAll('.size-button');
+            const button = change > 0 ? buttons[1] : buttons[0];
+            button.style.transform = 'scale(0.8)';
+            setTimeout(() => {
+                button.style.transform = 'scale(1)';
+            }, 100);
+            
+            // Feedback visual del texto del tamaño
+            const glassText = document.getElementById('glass-size-text');
+            glassText.classList.add('size-feedback');
+            
+            if (change > 0) {
+                glassText.classList.add('plus-feedback');
+                glassText.classList.remove('minus-feedback');
+            } else {
+                glassText.classList.add('minus-feedback');
+                glassText.classList.remove('plus-feedback');
+            }
+            
+            // Remover el efecto después de un momento
+            setTimeout(() => {
+                glassText.classList.remove('size-feedback', 'plus-feedback', 'minus-feedback');
+            }, 800);
+        }
+        
+        function updateGlassDisplay() {
+            const glassText = document.getElementById('glass-size-text');
+            glassText.textContent = formatGlassAmount(currentGlassSize);
+            updateProgress();
+        }
+        
+        function loadSettingsForm() {
+            document.getElementById('user-name').value = userSettings.name;
+            document.getElementById('user-gender').value = userSettings.gender;
+            document.getElementById('user-weight').value = userSettings.weight;
+            document.getElementById('daily-goal-setting').value = userSettings.dailyGoal;
+            document.getElementById('activity-level').value = userSettings.activityLevel;
+            document.getElementById('progress-unit').value = userSettings.progressUnit;
+            document.getElementById('glass-unit').value = userSettings.glassUnit;
+            document.getElementById('language-preference').value = userSettings.language;
+            document.getElementById('reminder-enabled').value = userSettings.reminderEnabled.toString();
+            document.getElementById('wake-time').value = userSettings.wakeTime;
+            document.getElementById('sleep-time').value = userSettings.sleepTime;
+            document.getElementById('sound-enabled').value = userSettings.soundEnabled.toString();
+            document.getElementById('sound-type').value = userSettings.soundType;
+        }
+        
+        function saveAllSettings() {
+            // Verificar si se modificó la meta diaria
+            const newDailyGoal = parseFloat(document.getElementById('daily-goal-setting').value) || 2.5;
+            const goalChanged = newDailyGoal !== userSettings.dailyGoal;
+            
+            // Verificar si se cambió el idioma
+            const newLanguage = document.getElementById('language-preference').value;
+            const languageChanged = newLanguage !== userSettings.language;
+            
+            // Guardar configuraciones
+            userSettings.name = document.getElementById('user-name').value.trim();
+            userSettings.gender = document.getElementById('user-gender').value;
+            userSettings.weight = parseFloat(document.getElementById('user-weight').value) || 70;
+            userSettings.dailyGoal = newDailyGoal;
+            userSettings.activityLevel = document.getElementById('activity-level').value;
+            userSettings.progressUnit = document.getElementById('progress-unit').value;
+            userSettings.glassUnit = document.getElementById('glass-unit').value;
+            userSettings.language = newLanguage;
+            userSettings.reminderEnabled = document.getElementById('reminder-enabled').value === 'true';
+            userSettings.wakeTime = document.getElementById('wake-time').value;
+            userSettings.sleepTime = document.getElementById('sleep-time').value;
+            userSettings.soundEnabled = document.getElementById('sound-enabled').value === 'true';
+            userSettings.soundType = document.getElementById('sound-type').value;
+            
+            // Actualizar meta diaria
+            dailyGoal = userSettings.dailyGoal;
+            
+            // Aplicar traducciones si cambió el idioma
+            if (languageChanged) {
+                updateLanguage();
+            }
+            
+            // Reiniciar recordatorios con nueva configuración
+            setupReminders();
+            
+            // Actualizar todas las vistas
+            updateProgress();
+            updateGlassDisplay();
+            
+            // Mostrar advertencia solo si se modificó la meta diaria
+            if (goalChanged) {
+                alert(getTranslation('omsWarning'));
+            } else {
+                alert(getTranslation('configSaved'));
+            }
+            
+            console.log('Configuraciones guardadas:', userSettings);
+        }
+        
+        function getTranslation(key) {
+            return translations[userSettings.language][key] || translations['es'][key];
+        }
+        
+        function updateLanguage() {
+            // Actualizar títulos de pantallas
+            const currentScreen = document.querySelector('.tab.active');
+            if (currentScreen) {
+                const screenName = currentScreen.onclick.toString().match(/showScreen\('(\w+)'\)/)[1];
+                document.getElementById('screen-title').textContent = getTranslation(screenName);
+            }
+            
+            // Actualizar título de home
+            const homeTitle = document.querySelector('.home-title');
+            if (homeTitle) {
+                homeTitle.textContent = getTranslation('dailyHydration');
+            }
+            
+            // Actualizar historial
+            updateHistorialLanguage();
+            
+            // Actualizar labels de settings
+            updateSettingsLanguage();
+        }
+        
+        function updateHistorialLanguage() {
+            // Actualizar título del historial
+            const historialTitle = document.querySelector('#historial-content .historial-title');
+            if (historialTitle) {
+                historialTitle.textContent = getTranslation('historial');
+            }
+            
+            // Actualizar botones de período
+            const todayBtn = document.querySelector('.period-btn');
+            const weekBtn = document.querySelectorAll('.period-btn')[1];
+            if (todayBtn) todayBtn.textContent = getTranslation('today');
+            if (weekBtn) weekBtn.textContent = getTranslation('lastWeek');
+            
+            // Actualizar labels del resumen
+            const summaryLabels = document.querySelectorAll('.summary-label');
+            if (summaryLabels[0]) summaryLabels[0].textContent = getTranslation('totalConsumed');
+            if (summaryLabels[1]) summaryLabels[1].textContent = getTranslation('dailyTarget');
+            if (summaryLabels[2]) summaryLabels[2].textContent = getTranslation('progress');
+            
+            // Actualizar título del gráfico
+            const chartTitle = document.getElementById('chart-title');
+            if (chartTitle) {
+                if (currentPeriod === 'today') {
+                    chartTitle.textContent = getTranslation('hydrationByHours');
+                } else {
+                    chartTitle.textContent = getTranslation('weeklyProgress');
+                }
+            }
+            
+            // Actualizar título de bebidas
+            const drinksTitle = document.querySelector('.drinks-title');
+            if (drinksTitle) {
+                drinksTitle.innerHTML = `
+                    ${getTranslation('lastDrinks')}
+                    <button class="clear-all-btn" onclick="clearAllDrinks()">${getTranslation('clearAll')}</button>
+                `;
+            }
+        }
+        
+        function updateSettingsLanguage() {
+            // Actualizar título de settings
+            const settingsTitle = document.querySelector('#settings-content .historial-title');
+            if (settingsTitle) {
+                settingsTitle.textContent = getTranslation('settings');
+            }
+            
+            // Actualizar títulos de secciones
+            const sectionTitles = document.querySelectorAll('.section-title');
+            if (sectionTitles[0]) sectionTitles[0].textContent = getTranslation('personalInfo');
+            if (sectionTitles[1]) sectionTitles[1].textContent = getTranslation('hydration');
+            if (sectionTitles[2]) sectionTitles[2].textContent = getTranslation('visualization');
+            
+            // Actualizar labels de formulario
+            const formLabels = document.querySelectorAll('.form-label');
+            const labelTexts = [getTranslation('name'), 'Sexo', getTranslation('weight'), 
+                              getTranslation('dailyGoal'), 'Nivel de actividad', 
+                              getTranslation('unitMeasure'), getTranslation('language')];
+            
+            formLabels.forEach((label, index) => {
+                if (labelTexts[index] && labelTexts[index] !== 'Sexo' && labelTexts[index] !== 'Nivel de actividad') {
+                    label.textContent = labelTexts[index];
+                }
+            });
+            
+            // Actualizar botones
+            const saveBtn = document.querySelector('.save-settings-btn');
+            const resetBtn = document.querySelector('.reset-settings-btn');
+            if (saveBtn) saveBtn.textContent = getTranslation('saveChanges');
+            if (resetBtn) resetBtn.textContent = getTranslation('restoreDefault');
+        }
+        
+        function resetSettings() {
+            if (confirm('¿Estás seguro de que quieres restaurar la configuración por defecto?')) {
+                userSettings = {
+                    name: '',
+                    gender: 'male',
+                    weight: 70,
+                    dailyGoal: 2.5,
+                    activityLevel: 'low',
+                    progressUnit: 'l',
+                    glassUnit: 'ml',
+                    language: 'es'
+                };
+                
+                dailyGoal = 2.5;
+                loadSettingsForm();
+                updateProgress();
+                updateGlassDisplay();
+                
+                alert('Configuración restaurada por defecto 🔄');
+            }
+        }
+        
+        function updateProgress() {
+            const totalConsumed = drinkHistory.reduce((sum, drink) => sum + drink.amount, 0);
+            const progressPercentage = (totalConsumed / dailyGoal) * 100;
+            const glassesNeeded = Math.ceil(dailyGoal / currentGlassSize);
+            
+            // Formatear progreso según preferencia de unidad de progreso
+            const consumedText = formatProgressAmount(totalConsumed);
+            const goalText = formatProgressAmount(dailyGoal);
+            
+            document.getElementById('progress-text').textContent = `${consumedText} / ${goalText}`;
+            document.getElementById('progress-fill').style.width = `${Math.min(progressPercentage, 100)}%`;
+            document.getElementById('glasses-text').textContent = `${glassesConsumed} / ${glassesNeeded} ${getTranslation('glasses')}`;
+            
+            const motivationText = document.getElementById('motivation-text');
+            const userName = userSettings.name ? userSettings.name : getTranslation('friend');
+            
+            if (glassesConsumed === 0) {
+                motivationText.textContent = `${getTranslation('hello')} ${userName}! ${getTranslation('startDay')}`;
+            } else if (totalConsumed >= dailyGoal) {
+                motivationText.textContent = `${getTranslation('excellent')} ${userName}! ${getTranslation('goalCompleted')} 🎉`;
+            } else {
+                const remaining = formatProgressAmount(dailyGoal - totalConsumed);
+                motivationText.textContent = `${getTranslation('youreGreat')} ${userName}! ${getTranslation('remaining')} ${remaining}`;
+            }
+        }
+        
+        function formatProgressAmount(amount) {
+            if (userSettings.progressUnit === 'ml') {
+                return Math.round(amount * 1000) + 'ml';
+            } else {
+                return amount.toFixed(1) + 'L';
+            }
+        }
+        
+        function formatGlassAmount(amount) {
+            if (userSettings.glassUnit === 'ml') {
+                return Math.round(amount * 1000) + 'ml';
+            } else {
+                return amount.toFixed(2) + 'L';
+            }
+        }
+        
+        function switchPeriod(period) {
+            currentPeriod = period;
+            
+            // Actualizar botones
+            document.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            // Actualizar vista
+            updateHistorial();
+        }
+        
+        function generateWeeklyData() {
+            const days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+            const weekData = [];
+            
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                
+                // Simular datos aleatorios para la semana
+                const consumed = Math.random() * 3; // 0-3 litros
+                const percentage = Math.round((consumed / dailyGoal) * 100);
+                
+                weekData.push({
+                    day: days[date.getDay() === 0 ? 6 : date.getDay() - 1],
+                    date: date.getDate(),
+                    consumed: consumed,
+                    percentage: Math.min(percentage, 100),
+                    achieved: consumed >= dailyGoal
+                });
+            }
+            
+            return weekData;
+        }
+        function updateHistorial() {
+            if (currentPeriod === 'today') {
+                updateTodayView();
+            } else {
+                updateWeekView();
+            }
+        }
+        
+        function updateTodayView() {
+            const totalConsumed = drinkHistory.reduce((sum, drink) => sum + drink.amount, 0);
+            const progressPercentage = Math.round((totalConsumed / dailyGoal) * 100);
+            
+            // Actualizar resumen
+            document.getElementById('total-consumed').textContent = `${totalConsumed.toFixed(1)}L`;
+            document.getElementById('daily-target').textContent = `${dailyGoal}L`;
+            document.getElementById('progress-percentage').textContent = `${progressPercentage}%`;
+            
+            // Estado de la meta
+            const goalStatus = document.getElementById('goal-status');
+            if (totalConsumed >= dailyGoal) {
+                goalStatus.textContent = getTranslation('goalAchieved');
+                goalStatus.className = 'goal-status goal-achieved';
+            } else {
+                const remaining = (dailyGoal - totalConsumed).toFixed(1);
+                goalStatus.textContent = `${getTranslation('goalPending')} ${remaining}L ${getTranslation('toComplete')}`;
+                goalStatus.className = 'goal-status goal-pending';
+            }
+            
+            // Actualizar gráfico de horas
+            document.getElementById('chart-title').textContent = getTranslation('hydrationByHours');
+            updateHourlyChart();
+            
+            // Actualizar lista de bebidas
+            updateDrinksList();
+        }
+        
+        function updateWeekView() {
+            // Calcular estadísticas semanales
+            const totalWeekly = weeklyData.reduce((sum, day) => sum + day.consumed, 0);
+            const avgDaily = totalWeekly / 7;
+            const daysAchieved = weeklyData.filter(day => day.achieved).length;
+            
+            // Actualizar resumen para vista semanal
+            document.getElementById('total-consumed').textContent = `${totalWeekly.toFixed(1)}L`;
+            document.getElementById('daily-target').textContent = `${(dailyGoal * 7).toFixed(1)}L`;
+            document.getElementById('progress-percentage').textContent = `${Math.round((avgDaily / dailyGoal) * 100)}%`;
+            
+            // Estado semanal
+            const goalStatus = document.getElementById('goal-status');
+            goalStatus.textContent = `📅 ${daysAchieved}/7 días completados - Promedio: ${avgDaily.toFixed(1)}L/día`;
+            goalStatus.className = daysAchieved >= 5 ? 'goal-status goal-achieved' : 'goal-status goal-pending';
+            
+            // Actualizar gráfico semanal
+            document.getElementById('chart-title').textContent = '📈 Progreso semanal';
+            updateWeeklyChart();
+            
+            // Ocultar lista de bebidas en vista semanal
+            document.querySelector('.drinks-container').style.display = 'none';
+        }
+        
+        function updateHourlyChart() {
+            const chartHours = document.getElementById('chart-hours');
+            chartHours.innerHTML = '';
+            
+            const maxAmount = Math.max(...hourlyData, 0.1);
+            
+            for (let hour = 0; hour < 24; hour++) {
+                const bar = document.createElement('div');
+                bar.className = 'hour-bar';
+                
+                const amount = hourlyData[hour];
+                const amountMl = Math.round(amount * 1000);
+                const height = (amount / maxAmount) * 100;
+                
+                // Información detallada en el tooltip
+                bar.setAttribute('data-info', `${hour}:00 - ${amountMl}ml`);
+                bar.style.height = `${height}%`;
+                
+                if (amount > 0) {
+                    bar.classList.add('active');
+                }
+                
+                chartHours.appendChild(bar);
+            }
+            
+            // Mostrar etiquetas de horas
+            document.getElementById('chart-labels').innerHTML = `
+                <span>6AM</span>
+                <span>12PM</span>
+                <span>6PM</span>
+                <span>12AM</span>
+            `;
+            
+            // Leyenda para vista de horas
+            document.getElementById('chart-legend').innerHTML = `
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #2196F3;"></div>
+                    <span>Agua consumida</span>
+                </div>
+            `;
+        }
+        
+        function updateWeeklyChart() {
+            const chartHours = document.getElementById('chart-hours');
+            chartHours.innerHTML = '';
+            
+            weeklyData.forEach(dayData => {
+                const bar = document.createElement('div');
+                bar.className = 'hour-bar';
+                
+                const consumedL = dayData.consumed.toFixed(1);
+                const status = dayData.achieved ? '✓ Meta alcanzada' : `${dayData.percentage}% completado`;
+                
+                // Información detallada en el tooltip
+                bar.setAttribute('data-info', `${dayData.day} ${dayData.date}: ${consumedL}L - ${status}`);
+                
+                // Altura basada en la meta diaria (no en el máximo)
+                const height = Math.min((dayData.consumed / dailyGoal) * 100, 100);
+                bar.style.height = `${height}%`;
+                
+                // Colores según el estado
+                if (dayData.achieved) {
+                    bar.classList.add('active');
+                    bar.style.background = '#4CAF50'; // Verde para meta alcanzada
+                } else if (dayData.consumed > 0) {
+                    bar.classList.add('active');
+                    bar.style.background = '#FF9800'; // Naranja para progreso parcial
+                } else {
+                    bar.style.background = '#e0e0e0'; // Gris para sin actividad
+                }
+                
+                chartHours.appendChild(bar);
+            });
+            
+            // Mostrar etiquetas de días
+            document.getElementById('chart-labels').innerHTML = weeklyData.map(d => 
+                `<span>${d.day}</span>`
+            ).join('');
+            
+            // Leyenda para vista semanal
+            document.getElementById('chart-legend').innerHTML = `
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #4CAF50;"></div>
+                    <span>Meta alcanzada</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #FF9800;"></div>
+                    <span>Progreso parcial</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #e0e0e0;"></div>
+                    <span>Sin actividad</span>
+                </div>
+            `;
+        }
+        
+        function updateDrinksList() {
+            const drinksList = document.getElementById('drinks-list');
+            const drinksContainer = document.querySelector('.drinks-container');
+            
+            // Mostrar solo en vista diaria
+            if (currentPeriod === 'week') {
+                drinksContainer.style.display = 'none';
+                return;
+            }
+            
+            drinksContainer.style.display = 'block';
+            
+            if (drinkHistory.length === 0) {
+                drinksList.innerHTML = '<div class="no-drinks">No has bebido agua hoy. ¡Comienza ahora!</div>';
+                return;
+            }
+            
+            drinksList.innerHTML = '';
+            
+            drinkHistory.slice(0, 10).forEach(drink => { // Mostrar últimas 10
+                const drinkItem = document.createElement('div');
+                drinkItem.className = 'drink-item';
+                drinkItem.innerHTML = `
+                    <div class="drink-info">
+                        <span class="drink-time">${drink.time}</span>
+                        <span class="drink-amount">${Math.round(drink.amount * 1000)}ml</span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteDrink(${drink.id})" title="Borrar">×</button>
+                `;
+                drinksList.appendChild(drinkItem);
+            });
+        }
+        
+        function deleteDrink(drinkId) {
+            const drinkIndex = drinkHistory.findIndex(drink => drink.id === drinkId);
+            if (drinkIndex !== -1) {
+                const drink = drinkHistory[drinkIndex];
+                
+                // Remover del historial
+                drinkHistory.splice(drinkIndex, 1);
+                
+                // Actualizar datos por hora
+                hourlyData[drink.hour] -= drink.amount;
+                if (hourlyData[drink.hour] < 0) hourlyData[drink.hour] = 0;
+                
+                // Actualizar contadores
+                glassesConsumed = Math.max(0, glassesConsumed - 1);
+                
+                // Actualizar vistas
+                updateProgress();
+                updateHistorial();
+                
+                console.log(`Bebida de ${Math.round(drink.amount * 1000)}ml eliminada`);
+            }
+        }
+        
+        function clearAllDrinks() {
+            if (drinkHistory.length === 0) return;
+            
+            if (confirm('¿Estás seguro de que quieres borrar todo el historial de hoy?')) {
+                drinkHistory = [];
+                hourlyData = new Array(24).fill(0);
+                glassesConsumed = 0;
+                
+                updateProgress();
+                updateHistorial();
+                
+                console.log('Historial limpiado completamente');
+            }
+        }
+        
+        // Initialize
+        updateProgress();
+        updateGlassDisplay();
+        loadSettingsForm();
+        setupReminders();
+        
+        // REMINDER FUNCTIONS
+        function setupReminders() {
+            // Limpiar recordatorio anterior
+            if (reminderTimer) {
+                clearInterval(reminderTimer);
+                reminderTimer = null;
+            }
+            
+            if (!userSettings.reminderEnabled) {
+                return;
+            }
+            
+            // Calcular intervalo automático basado en horas despierto y meta diaria
+            const reminderInterval = calculateReminderInterval();
+            
+            // Configurar nuevo recordatorio
+            reminderTimer = setInterval(() => {
+                if (shouldShowReminder()) {
+                    showReminder();
+                }
+            }, reminderInterval * 60 * 1000); // Convertir minutos a milisegundos
+        }
+        
+        function calculateReminderInterval() {
+            // Calcular horas despierto
+            const [wakeHour, wakeMin] = userSettings.wakeTime.split(':').map(Number);
+            const [sleepHour, sleepMin] = userSettings.sleepTime.split(':').map(Number);
+            
+            let awakeHours;
+            if (sleepHour > wakeHour) {
+                // Mismo día (ej: 7:00 - 22:00)
+                awakeHours = (sleepHour - wakeHour) + (sleepMin - wakeMin) / 60;
+            } else {
+                // Cruza medianoche (ej: 22:00 - 7:00)
+                awakeHours = (24 - wakeHour + sleepHour) + (sleepMin - wakeMin) / 60;
+            }
+            
+            // Calcular cuántos vasos necesita por día
+            const glassesNeeded = Math.ceil(dailyGoal / currentGlassSize);
+            
+            // Calcular intervalo: horas despierto / número de vasos
+            const intervalHours = awakeHours / glassesNeeded;
+            const intervalMinutes = Math.max(30, Math.round(intervalHours * 60)); // Mínimo 30 minutos
+            
+            console.log(`Horas despierto: ${awakeHours.toFixed(1)}h, Vasos necesarios: ${glassesNeeded}, Intervalo: ${intervalMinutes} min`);
+            
+            return intervalMinutes;
+        }
+        
+        function shouldShowReminder() {
+            // No mostrar recordatorios si ya se completó la meta
+            if (goalCompletedToday) {
+                return false;
+            }
+            
+            const now = new Date();
+            const currentTime = now.getHours() * 60 + now.getMinutes();
+            
+            // Convertir horas de despertar y dormir a minutos
+            const [wakeHour, wakeMin] = userSettings.wakeTime.split(':').map(Number);
+            const [sleepHour, sleepMin] = userSettings.sleepTime.split(':').map(Number);
+            const wakeTime = wakeHour * 60 + wakeMin;
+            const sleepTime = sleepHour * 60 + sleepMin;
+            
+            // Verificar si está en horario activo
+            let inActiveHours;
+            if (sleepTime > wakeTime) {
+                // Mismo día (ej: 7:00 - 22:00)
+                inActiveHours = currentTime >= wakeTime && currentTime <= sleepTime;
+            } else {
+                // Cruza medianoche (ej: 22:00 - 7:00)
+                inActiveHours = currentTime >= wakeTime || currentTime <= sleepTime;
+            }
+            
+            if (!inActiveHours) {
+                return false;
+            }
+            
+            // Verificar si ya se mostró un recordatorio recientemente
+            if (lastReminderTime) {
+                const timeSinceLastReminder = now.getTime() - lastReminderTime;
+                const currentInterval = calculateReminderInterval();
+                const intervalMs = currentInterval * 60 * 1000;
+                if (timeSinceLastReminder < intervalMs) {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        
+        function showReminder() {
+            const totalConsumed = drinkHistory.reduce((sum, drink) => sum + drink.amount, 0);
+            const remaining = Math.max(0, dailyGoal - totalConsumed);
+            const userName = userSettings.name || 'amigo';
+            
+            let message;
+            if (remaining <= 0) {
+                message = `¡Excelente ${userName}! Ya completaste tu meta, pero mantente hidratado.`;
+            } else {
+                const remainingFormatted = formatProgressAmount(remaining);
+                message = `Hola ${userName}, es momento de beber agua. Te faltan ${remainingFormatted} para tu meta diaria.`;
+            }
+            
+            document.getElementById('reminder-message').textContent = message;
+            document.getElementById('reminder-notification').classList.remove('hidden');
+            
+            lastReminderTime = new Date().getTime();
+            
+            // Auto-ocultar después de 10 segundos
+            setTimeout(() => {
+                closeReminder();
+            }, 10000);
+        }
+        
+        function closeReminder() {
+            document.getElementById('reminder-notification').classList.add('hidden');
+        }
+        
+        function snoozeReminder() {
+            closeReminder();
+            // Programar recordatorio en 10 minutos
+            setTimeout(() => {
+                if (userSettings.reminderEnabled && shouldShowReminder()) {
+                    showReminder();
+                }
+            }, 10 * 60 * 1000); // 10 minutos
+        }
+        
+        function drinkFromReminder() {
+            closeReminder();
+            drinkWater();
+        }
+        
+        function showCongratulations() {
+            const userName = userSettings.name || 'amigo';
+            const message = `¡Excelente ${userName}! Has completado tu meta diaria de ${dailyGoal}L. Los recordatorios se han pausado por hoy.`;
+            
+            document.getElementById('congratulations-message').textContent = message;
+            document.getElementById('congratulations-overlay').classList.remove('hidden');
+        }
+        
+        function closeCongratulations() {
+            document.getElementById('congratulations-overlay').classList.add('hidden');
+        }
+        
+        function playGlupSound() {
+            // Verificar si el sonido está activado
+            if (!userSettings.soundEnabled) {
+                return;
+            }
+            
+            playSound(userSettings.soundType);
+        }
+        
+        function testSelectedSound() {
+            const selectedType = document.getElementById('sound-type').value;
+            playSound(selectedType);
+        }
+        
+        function playSound(soundType) {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                // Diferentes tipos de sonido según la selección
+                switch(soundType) {
+                    case 'glup':
+                        // Usar archivo MP3 para glup
+                        try {
+                            const audio = new Audio('src/utils/sound/glug-glug-glug.mp3');
+                            audio.volume = 0.5;
+                            audio.play();
+                            return; // Salir para no usar el oscilador
+                        } catch (e) {
+                            console.log('MP3 no disponible, usando sonido sintético');
+                            // Fallback al sonido sintético si el MP3 falla
+                        }
+                        
+                        // Fallback sintético para glup
+                        oscillator.type = 'sine';
+                        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                        oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.1);
+                        oscillator.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 0.2);
+                        
+                        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                        gainNode.gain.linearRampToValueAtTime(0.5, audioContext.currentTime + 0.01);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                        
+                        oscillator.start(audioContext.currentTime);
+                        oscillator.stop(audioContext.currentTime + 0.3);
+                        break;
+                        
+                    case 'drop':
+                        // Sonido sintético original (antes era glup)
+                        oscillator.type = 'sine';
+                        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                        oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.1);
+                        oscillator.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 0.2);
+                        
+                        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                        gainNode.gain.linearRampToValueAtTime(0.5, audioContext.currentTime + 0.01);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                        
+                        oscillator.start(audioContext.currentTime);
+                        oscillator.stop(audioContext.currentTime + 0.3);
+                        break;
+                        
+                    case 'bubble':
+                        // Sonido de burbuja
+                        oscillator.type = 'square';
+                        oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+                        oscillator.frequency.linearRampToValueAtTime(600, audioContext.currentTime + 0.05);
+                        oscillator.frequency.linearRampToValueAtTime(300, audioContext.currentTime + 0.1);
+                        oscillator.frequency.exponentialRampToValueAtTime(150, audioContext.currentTime + 0.25);
+                        
+                        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                        gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.01);
+                        gainNode.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + 0.1);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                        
+                        oscillator.start(audioContext.currentTime);
+                        oscillator.stop(audioContext.currentTime + 0.3);
+                        break;
+                        
+                    default:
+                        // Fallback al sonido clásico
+                        oscillator.type = 'sine';
+                        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                        oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.1);
+                        oscillator.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 0.2);
+                        
+                        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                        gainNode.gain.linearRampToValueAtTime(0.5, audioContext.currentTime + 0.01);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                        
+                        oscillator.start(audioContext.currentTime);
+                        oscillator.stop(audioContext.currentTime + 0.3);
+                }
+                
+            } catch (error) {
+                console.log('Audio no disponible:', error);
+            }
+        }
+        
+        // Configurar nombre por defecto para demo
+        setTimeout(() => {
+            userSettings.name = 'Usuario';
+            updateProgress();
+        }, 500);
+        
+        // Agregar algunas bebidas de ejemplo
+        setTimeout(() => {
+            // Simular algunas bebidas del día (SIN completar la meta)
+            const exampleDrinks = [
+                {hour: 8, amount: 0.2},
+                {hour: 10, amount: 0.15},
+                {hour: 12, amount: 0.2}
+            ];
+            
+            exampleDrinks.forEach((drink, index) => {
+                setTimeout(() => {
+                    const now = new Date();
+                    now.setHours(drink.hour, Math.floor(Math.random() * 60));
+                    const timeString = now.toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'});
+                    
+                    drinkHistory.unshift({
+                        id: Date.now() + index,
+                        time: timeString,
+                        amount: drink.amount,
+                        hour: drink.hour
+                    });
+                    
+                    hourlyData[drink.hour] += drink.amount;
+                    glassesConsumed++;
+                    
+                    updateProgress();
+                }, index * 100);
+            });
+        }, 1000);
+    </script>
+</body>
+</html>
