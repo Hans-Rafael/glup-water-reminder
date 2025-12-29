@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert, Vibration } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { Audio } from 'expo-av';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import DrinkContext from '../context/DrinkContext';
 import { getTranslation } from '../utils/translations';
 import { scheduleWaterReminders, cancelAllReminders } from '../utils/notifications';
@@ -494,6 +495,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 14
   },
+  resetBtn: {
     backgroundColor: '#ff5722',
     padding: 12,
     borderRadius: 8,

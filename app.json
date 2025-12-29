@@ -1,11 +1,25 @@
 {
   "expo": {
-    "name": "GLUP",
+    "name": "GLUP Water Reminder",
     "slug": "waterreminderapp",
     "version": "1.0.0",
+    "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#f0f8ff"
+    },
     "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#2196F3"
+      },
       "package": "com.hansvekoni.waterreminderapp"
+    },
+    "ios": {
+      "bundleIdentifier": "com.hansvekoni.waterreminderapp"
     },
     "extra": {
       "eas": {
