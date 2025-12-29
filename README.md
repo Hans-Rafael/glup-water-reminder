@@ -112,5 +112,5 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo [LICENSE](LICENSE) para
 
 <div align="center">
   <p>💧 <strong>Mantente hidratado, mantente saludable</strong> 💧</p>
-  <p>Hecho con ❤️ usando React Native y Expo</p>
+  <p>Hecho con ❤️ usando React Native Y Expo</p>
 </div>
