@@ -109,6 +109,45 @@ const SettingsScreen = () => {
     Alert.alert(getTranslation('configSaved', language), getTranslation('settingsSaved', language));
   };
 
+  const clearAllData = () => {
+    Alert.alert(
+      getTranslation('clearAllData', language),
+      getTranslation('confirmClearData', language),
+      [
+        { text: getTranslation('cancel', language), style: 'cancel' },
+        {
+          text: getTranslation('clearAllData', language),
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await AsyncStorage.multiRemove([
+                '@glup_drinks',
+                '@glup_dailyGoal',
+                '@glup_glassSize',
+                '@glup_firstTime',
+                '@glup_userName',
+                '@glup_language',
+                '@glup_soundEnabled',
+                '@glup_soundType',
+                '@glup_wakeTime',
+                '@glup_sleepTime',
+                '@glup_reminderEnabled'
+              ]);
+              
+              setDrinks([]);
+              Alert.alert(
+                getTranslation('dataCleared', language), 
+                getTranslation('allDataCleared', language)
+              );
+            } catch (error) {
+              console.log('Error clearing data:', error);
+            }
+          }
+        }
+      ]
+    );
+  };
+
   const resetSettings = () => {
     Alert.alert(
       getTranslation('restoreDefault', language),
@@ -369,6 +408,10 @@ const SettingsScreen = () => {
           <Text style={styles.saveText}>💾 {getTranslation('saveChanges', language)}</Text>
         </TouchableOpacity>
         
+        <TouchableOpacity style={styles.clearBtn} onPress={clearAllData}>
+          <Text style={styles.clearText}>🗑️ {getTranslation('clearAllData', language)}</Text>
+        </TouchableOpacity>
+        
         <TouchableOpacity style={styles.resetBtn} onPress={resetSettings}>
           <Text style={styles.resetText}>🔄 {getTranslation('restoreDefault', language)}</Text>
         </TouchableOpacity>
@@ -440,7 +483,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16
   },
-  resetBtn: {
+  clearBtn: {
+    backgroundColor: '#f44336',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center'
+  },
+  clearText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 14
+  },
     backgroundColor: '#ff5722',
     padding: 12,
     borderRadius: 8,
