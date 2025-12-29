@@ -75,9 +75,20 @@ Meta Base = (Peso × 35ml) × 0.8
 
 ## 📸 Capturas de Pantalla
 
-| Pantalla Principal | Historial | Configuración |
-|:--:|:--:|:--:|
-| ![Home](docs/screenshots/home.png) | ![History](docs/screenshots/history.png) | ![Settings](docs/screenshots/settings.png) |
+<div align="center">
+  <table>
+    <tr>
+      <td align="center"><strong>Pantalla Principal</strong></td>
+      <td align="center"><strong>Historial</strong></td>
+      <td align="center"><strong>Configuración</strong></td>
+    </tr>
+    <tr>
+      <td><img src="docs/screenshots/home.jpeg" alt="Home" width="250"/></td>
+      <td><img src="docs/screenshots/history.jpeg" alt="History" width="250"/></td>
+      <td><img src="docs/screenshots/settings.jpeg" alt="Settings" width="250" height="444"/></td>
+    </tr>
+  </table>
+</div>
 
 ## 🤝 Contribuir
 
