@@ -1,4 +1,41 @@
 {
-  "name": "WaterReminderApp",
-  "displayName": "Water Reminder"
+  "expo": {
+    "name": "WaterReminderApp",
+    "slug": "waterreminderapp",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#f0f8ff"
+    },
+    "jsEngine": "hermes",
+    "sdkVersion": "48.0.0",
+    "updates": {
+      "enabled": false
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "android": {
+      "package": "com.hansvekoni.waterreminderapp",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#f0f8ff"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.hansvekoni.waterreminderapp"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "d0634610-10be-406a-b2a5-a563b86cb5e4"
+      }
+    }
+  }
 }
