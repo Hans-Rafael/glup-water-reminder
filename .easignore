@@ -1,0 +1,12 @@
+node_modules
+android/.gradle
+android/app/build
+build
+.gradle
+dist
+.vscode
+.idea
+*.keystore
+local.properties
+*.zip
+.expo

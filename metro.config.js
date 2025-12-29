@@ -1,5 +1,12 @@
-const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
+const { getDefaultConfig } = require('@expo/metro-config');
+const path = require('path');
 
-const config = {};
+const projectRoot = __dirname;
 
-module.exports = mergeConfig(getDefaultConfig(__dirname), config);
+// Use Expo's default Metro config as base to avoid missing-assets issues
+const config = getDefaultConfig(projectRoot);
+
+// Example safe override (uncomment if you need to add cjs extensions):
+// config.resolver.sourceExts.push('cjs');
+
+module.exports = config;

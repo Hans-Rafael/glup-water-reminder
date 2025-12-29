@@ -325,18 +325,26 @@
         }
         
         .hour-bar:hover::after {
-            content: attr(data-info);
+            display: none;
+        }
+
+        .chart-info {
             position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #333;
-            color: white;
-            padding: 4px 6px;
-            border-radius: 4px;
-            font-size: 10px;
-            white-space: nowrap;
-            z-index: 10;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255,255,255,0.95);
+            padding: 8px 10px;
+            font-size: 12px;
+            text-align: center;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.06);
+            border-top: 1px solid #eef0f2;
+            z-index: 20;
+            transition: transform 0.18s ease, opacity 0.18s ease;
+        }
+
+        .chart-info.hidden {
+            display: none;
         }
         
         .chart-legend {
@@ -862,7 +870,7 @@
                         <span class="summary-value" id="total-consumed">0.0L</span>
                     </div>
                     <div class="summary-row">
-                        <span class="summary-label">Meta diaria:</span>
+                        <span class="summary-label">Meta</span>
                         <span class="summary-value" id="daily-target">2.5L</span>
                     </div>
                     <div class="summary-row">
@@ -881,6 +889,7 @@
                         <div class="chart-hours" id="chart-hours">
                             <!-- Se genera dinámicamente -->
                         </div>
+                        <div id="chart-info" class="chart-info hidden"></div>
                     </div>
                     <div class="chart-labels" id="chart-labels">
                         <span>6AM</span>
@@ -1211,17 +1220,16 @@
                 button.style.transform = 'scale(1)';
             }, 100);
             
-            // Feedback visual
+            // Feedback visual (use CSS classes: blue for +, red for -)
             const glassText = document.getElementById('glass-size-text');
             const originalText = glassText.textContent;
             glassText.textContent = `+${Math.round(currentGlassSize * 1000)}ml`;
-            glassText.style.color = '#4CAF50';
-            glassText.style.fontWeight = 'bold';
-            
+            glassText.classList.add('size-feedback', 'plus-feedback');
+            glassText.classList.remove('minus-feedback');
+
             setTimeout(() => {
                 glassText.textContent = originalText;
-                glassText.style.color = '#666';
-                glassText.style.fontWeight = '500';
+                glassText.classList.remove('size-feedback', 'plus-feedback', 'minus-feedback');
             }, 1000);
             
             // Verificar meta
@@ -1591,6 +1599,7 @@
         
         function updateHourlyChart() {
             const chartHours = document.getElementById('chart-hours');
+            hideChartInfo();
             chartHours.innerHTML = '';
             
             const maxAmount = Math.max(...hourlyData, 0.1);
@@ -1612,6 +1621,11 @@
                 }
                 
                 chartHours.appendChild(bar);
+
+                // Mostrar info en la parte inferior al tocar/clic
+                const infoText = bar.getAttribute('data-info');
+                bar.addEventListener('click', () => showChartInfo(bar.getAttribute('data-info')));
+                bar.addEventListener('touchstart', () => showChartInfo(bar.getAttribute('data-info')));
             }
             
             // Mostrar etiquetas de horas
@@ -1633,6 +1647,7 @@
         
         function updateWeeklyChart() {
             const chartHours = document.getElementById('chart-hours');
+            hideChartInfo();
             chartHours.innerHTML = '';
             
             weeklyData.forEach(dayData => {
@@ -1661,6 +1676,9 @@
                 }
                 
                 chartHours.appendChild(bar);
+                // Mostrar info en la parte inferior al tocar/clic (vista semanal)
+                bar.addEventListener('click', () => showChartInfo(bar.getAttribute('data-info')));
+                bar.addEventListener('touchstart', () => showChartInfo(bar.getAttribute('data-info')));
             });
             
             // Mostrar etiquetas de días
@@ -1683,6 +1701,19 @@
                     <span>Sin actividad</span>
                 </div>
             `;
+        }
+        
+        function showChartInfo(text) {
+            const infoEl = document.getElementById('chart-info');
+            if (!infoEl) return;
+            infoEl.textContent = text || '';
+            infoEl.classList.remove('hidden');
+        }
+
+        function hideChartInfo() {
+            const infoEl = document.getElementById('chart-info');
+            if (!infoEl) return;
+            infoEl.classList.add('hidden');
         }
         
         function updateDrinksList() {

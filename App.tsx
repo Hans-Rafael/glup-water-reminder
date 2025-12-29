@@ -1,14 +1,26 @@
-import React from 'react';
-import {StatusBar} from 'react-native';
+import React, { useContext } from 'react';
+import { registerRootComponent } from 'expo';
 import AppNavigator from './src/navigation/AppNavigator';
+import { DrinkProvider } from './src/context/DrinkContext';
+import DrinkContext from './src/context/DrinkContext';
+import OnboardingScreen from './src/screens/OnboardingScreen';
 
-function App(): JSX.Element {
+function AppContent() {
+  const ctx = useContext(DrinkContext);
+  
+  if (ctx?.isFirstTime) {
+    return <OnboardingScreen onComplete={() => ctx.setIsFirstTime(false)} />;
+  }
+  
+  return <AppNavigator />;
+}
+
+export default function App() {
   return (
-    <>
-      <StatusBar barStyle="light-content" backgroundColor="#2196F3" />
-      <AppNavigator />
-    </>
+    <DrinkProvider>
+      <AppContent />
+    </DrinkProvider>
   );
 }
 
-export default App;
+registerRootComponent(App);
