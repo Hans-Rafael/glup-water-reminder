@@ -1,15 +1,105 @@
-Expo-managed skeleton for WaterReminderApp
+<div align="center">
+  <img src="src/assets/glup_ico.png" alt="GLUP Water Reminder" width="120" height="120">
+  <h1>💧 GLUP Water Reminder</h1>
+  <p><em>Tu compañero inteligente para mantenerte hidratado</em></p>
+</div>
 
-To run locally:
+## 📱 Acerca de la App
 
-1. cd expo-managed
-2. npm install
-3. npm run start
+**GLUP Water Reminder** es una aplicación móvil intuitiva que te ayuda a mantener una hidratación saludable a lo largo del día. Con un diseño elegante y funcionalidades inteligentes, hace que beber agua sea fácil y divertido.
 
-To build an APK with EAS:
+### ✨ Características Principales
 
-1. npm install -g eas-cli
-2. eas login
-3. cd expo-managed
-4. eas build:configure
-5. eas build --platform android --profile preview
+- 🥤 **Botón GLUP interactivo** - Registra tu consumo de agua con un toque
+- 📊 **Seguimiento inteligente** - Visualiza tu progreso diario con gráficos
+- ⏰ **Recordatorios personalizados** - Notificaciones basadas en tu horario
+- 🧮 **Calculadora de hidratación** - Meta personalizada según peso, actividad y clima
+- 📈 **Historial completo** - Analiza tus patrones de hidratación
+- 🔊 **Sonidos personalizables** - Glup clásico, gotas de agua o burbujas
+- 🌍 **Bilingüe** - Español e Inglés
+- 💡 **Tips de hidratación** - Consejos prácticos para mantenerte saludable
+
+## 🛠️ Tecnologías Utilizadas
+
+- **React Native** - Framework multiplataforma
+- **Expo** - Plataforma de desarrollo y deployment
+- **TypeScript** - Tipado estático para JavaScript
+- **AsyncStorage** - Persistencia de datos local
+- **Expo Notifications** - Sistema de notificaciones push
+- **Expo AV** - Reproducción de audio
+- **React Navigation** - Navegación entre pantallas
+
+## 📥 Descargar APK
+
+Descarga la última versión de la aplicación desde la carpeta [releases/](./releases/)
+
+## 🚀 Instalación para Desarrollo
+
+```bash
+# Clonar el repositorio
+git clone https://github.com/Hans-Rafael/glup-water-reminder.git
+
+# Navegar al directorio
+cd glup-water-reminder
+
+# Instalar dependencias
+npm install
+
+# Ejecutar en desarrollo
+npx expo start
+```
+
+## 📱 Generar APK
+
+```bash
+# Instalar EAS CLI
+npm install -g eas-cli
+
+# Login en Expo
+eas login
+
+# Generar APK
+eas build --platform android --profile preview
+```
+
+## 🎯 Fórmula de Hidratación
+
+La app utiliza la **regla científica del 80%** para calcular tu meta diaria:
+
+```
+Meta Base = (Peso × 35ml) × 0.8
++ Ajustes por género (+500ml hombres, +300ml embarazadas)
++ Ajustes por actividad (+500ml moderada, +1L alta)
++ Ajustes por clima (+750ml clima caluroso)
+```
+
+## 📸 Capturas de Pantalla
+
+| Pantalla Principal | Historial | Configuración |
+|:--:|:--:|:--:|
+| ![Home](docs/screenshots/home.png) | ![History](docs/screenshots/history.png) | ![Settings](docs/screenshots/settings.png) |
+
+## 🤝 Contribuir
+
+Las contribuciones son bienvenidas. Por favor:
+
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver el archivo [LICENSE](LICENSE) para más detalles.
+
+## 👨‍💻 Autor
+
+**Hans Rafael** - [@Hans-Rafael](https://github.com/Hans-Rafael)
+
+---
+
+<div align="center">
+  <p>💧 <strong>Mantente hidratado, mantente saludable</strong> 💧</p>
+  <p>Hecho con ❤️ usando React Native y Expo</p>
+</div>
