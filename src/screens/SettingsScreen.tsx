@@ -22,7 +22,8 @@ const SettingsScreen = () => {
     weight: '70', setWeight: (_: string) => {},
     gender: 'male', setGender: (_: string) => {},
     activityLevel: 'low', setActivityLevel: (_: string) => {},
-    climate: 'temperate', setClimate: (_: string) => {}
+    climate: 'temperate', setClimate: (_: string) => {},
+    currentGlassSize: 0.2
   };
   const { 
     dailyGoal, setDailyGoal, userName, setUserName, 
@@ -30,7 +31,8 @@ const SettingsScreen = () => {
     soundType, setSoundType, wakeTime, setWakeTime,
     sleepTime, setSleepTime, reminderEnabled, setReminderEnabled,
     drinks, setDrinks, weight, setWeight, gender, setGender,
-    activityLevel, setActivityLevel, climate, setClimate
+    activityLevel, setActivityLevel, climate, setClimate,
+    currentGlassSize
   } = ctx || fallback;
   
   // Estados locales para configuraciones
@@ -67,8 +69,6 @@ const SettingsScreen = () => {
     
     return Math.round(waterGoal * 10) / 10; // Redondear a 1 decimal
   };
-  const [progressUnit, setProgressUnit] = useState('l');
-  const [glassUnit, setGlassUnit] = useState('ml');
 
   const playTestSound = async () => {
     try {
