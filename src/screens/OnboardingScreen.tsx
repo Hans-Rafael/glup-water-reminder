@@ -2,14 +2,16 @@ import React, { useState, useContext } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DrinkContext from '../context/DrinkContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const OnboardingScreen = ({ onComplete }: { onComplete: () => void }) => {
   const ctx = useContext(DrinkContext);
-  const [name, setName] = useState('');
-  const [weight, setWeight] = useState('70');
-  const [gender, setGender] = useState('male');
-  const [activityLevel, setActivityLevel] = useState('low');
-  const [climate, setClimate] = useState('temperate');
+  const [weight, setWeight] = useState(ctx?.weight ?? '70');
+  const [gender, setGender] = useState(ctx?.gender ?? 'male');
+  const [activityLevel, setActivityLevel] = useState(ctx?.activityLevel ?? 'low');
+  const [climate, setClimate] = useState(ctx?.climate ?? 'temperate');
+  const [wakeTime, setWakeTime] = useState(ctx?.wakeTime ?? '07:00');
+  const [sleepTime, setSleepTime] = useState(ctx?.sleepTime ?? '22:00');
 
   const calculateGoal = () => {
     const weightNum = parseFloat(weight) || 70;
@@ -44,14 +46,32 @@ const OnboardingScreen = ({ onComplete }: { onComplete: () => void }) => {
   const handleComplete = () => {
     const goal = calculateGoal();
     if (ctx) {
-      ctx.setUserName(name || 'Usuario');
       ctx.setDailyGoal(goal);
       ctx.setWeight(weight);
       ctx.setGender(gender);
       ctx.setActivityLevel(activityLevel);
       ctx.setClimate(climate);
+      ctx.setWakeTime(wakeTime);
+      ctx.setSleepTime(sleepTime);
     }
-    onComplete();
+    // Persist immediately to AsyncStorage to ensure continuity
+    (async () => {
+      try {
+        await AsyncStorage.multiSet([
+          ['@glup_dailyGoal', String(goal)],
+          ['@glup_weight', weight],
+          ['@glup_gender', gender],
+          ['@glup_activityLevel', activityLevel],
+          ['@glup_climate', climate],
+          ['@glup_wakeTime', wakeTime],
+          ['@glup_sleepTime', sleepTime],
+          ['@glup_firstTime', 'false']
+        ]);
+      } catch (e) {}
+      // Update context flag so app switches away from onboarding immediately
+      if (ctx) ctx.setIsFirstTime(false);
+      onComplete();
+    })();
   };
 
   return (
@@ -59,15 +79,7 @@ const OnboardingScreen = ({ onComplete }: { onComplete: () => void }) => {
       <Text style={styles.title}>¡Bienvenido a Glup! 💧</Text>
       <Text style={styles.subtitle}>Configuremos tu perfil de hidratación</Text>
 
-      <View style={styles.section}>
-        <Text style={styles.label}>Tu nombre</Text>
-        <TextInput 
-          style={styles.input} 
-          value={name} 
-          onChangeText={setName}
-          placeholder="Ingresa tu nombre"
-        />
-      </View>
+      {/* Nombre eliminado: solo pedimos los datos necesarios */}
 
       <View style={styles.section}>
         <Text style={styles.label}>Peso (kg)</Text>
@@ -111,6 +123,26 @@ const OnboardingScreen = ({ onComplete }: { onComplete: () => void }) => {
             <Picker.Item label="Caluroso" value="hot" />
           </Picker>
         </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.label}>Hora que te despiertas</Text>
+        <TextInput
+          style={styles.input}
+          value={wakeTime}
+          onChangeText={setWakeTime}
+          placeholder="07:00"
+        />
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.label}>Hora que te acuestas</Text>
+        <TextInput
+          style={styles.input}
+          value={sleepTime}
+          onChangeText={setSleepTime}
+          placeholder="22:00"
+        />
       </View>
 
       <View style={styles.goalPreview}>

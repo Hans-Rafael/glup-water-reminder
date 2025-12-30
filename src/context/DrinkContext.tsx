@@ -146,54 +146,70 @@ export const DrinkProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, []);
 
   // Guardar configuraciones de usuario
+
   useEffect(() => {
+    if (isLoading) return;
     AsyncStorage.setItem('@glup_userName', userName).catch(() => {});
-  }, [userName]);
+  }, [userName, isLoading]);
   useEffect(() => {
+    if (isLoading) return;
     AsyncStorage.setItem('@glup_language', language).catch(() => {});
-  }, [language]);
+  }, [language, isLoading]);
   useEffect(() => {
+    if (isLoading) return;
     AsyncStorage.setItem('@glup_soundEnabled', String(soundEnabled)).catch(() => {});
-  }, [soundEnabled]);
+  }, [soundEnabled, isLoading]);
   useEffect(() => {
+    if (isLoading) return;
     AsyncStorage.setItem('@glup_soundType', soundType).catch(() => {});
-  }, [soundType]);
+  }, [soundType, isLoading]);
   useEffect(() => {
+    if (isLoading) return;
     AsyncStorage.setItem('@glup_wakeTime', wakeTime).catch(() => {});
-  }, [wakeTime]);
+  }, [wakeTime, isLoading]);
   useEffect(() => {
+    if (isLoading) return;
     AsyncStorage.setItem('@glup_sleepTime', sleepTime).catch(() => {});
-  }, [sleepTime]);
+  }, [sleepTime, isLoading]);
   useEffect(() => {
+    if (isLoading) return;
     AsyncStorage.setItem('@glup_reminderEnabled', String(reminderEnabled)).catch(() => {});
-  }, [reminderEnabled]);
+  }, [reminderEnabled, isLoading]);
   
   // Guardar datos del perfil
   useEffect(() => {
+    if (isLoading) return;
     AsyncStorage.setItem('@glup_weight', weight).catch(() => {});
-  }, [weight]);
+  }, [weight, isLoading]);
   useEffect(() => {
+    if (isLoading) return;
     AsyncStorage.setItem('@glup_gender', gender).catch(() => {});
-  }, [gender]);
+  }, [gender, isLoading]);
   useEffect(() => {
+    if (isLoading) return;
     AsyncStorage.setItem('@glup_activityLevel', activityLevel).catch(() => {});
-  }, [activityLevel]);
+  }, [activityLevel, isLoading]);
   useEffect(() => {
+    if (isLoading) return;
     AsyncStorage.setItem('@glup_climate', climate).catch(() => {});
-  }, [climate]);
+  }, [climate, isLoading]);
 
   // Save when relevant values change
   useEffect(() => {
+    if (isLoading) return;
     AsyncStorage.setItem('@glup_drinks', JSON.stringify(drinks)).catch(() => {});
-  }, [drinks]);
+  }, [drinks, isLoading]);
   useEffect(() => {
+    if (isLoading) return;
     AsyncStorage.setItem('@glup_dailyGoal', String(dailyGoal)).catch(() => {});
-  }, [dailyGoal]);
+  }, [dailyGoal, isLoading]);
   useEffect(() => {
+    if (isLoading) return;
     AsyncStorage.setItem('@glup_glassSize', String(currentGlassSize)).catch(() => {});
-  }, [currentGlassSize]);
+  }, [currentGlassSize, isLoading]);
 
   useEffect(() => {
+    // Always persist firstTime changes (so onboarding state is kept)
     AsyncStorage.setItem('@glup_firstTime', String(isFirstTime)).catch(() => {});
   }, [isFirstTime]);
 

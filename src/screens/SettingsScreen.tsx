@@ -1,6 +1,7 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert, Vibration } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import { useNavigation } from '@react-navigation/native';
 import { Audio } from 'expo-av';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DrinkContext from '../context/DrinkContext';
@@ -39,6 +40,8 @@ const SettingsScreen = () => {
   const [goalText, setGoalText] = useState(String(dailyGoal));
   const [progressUnit, setProgressUnit] = useState('l');
   const [glassUnit, setGlassUnit] = useState('ml');
+  const [isDirty, setIsDirty] = useState(false);
+  const navigation = useNavigation();
 
   const calculateDailyGoal = () => {
     const weightNum = parseFloat(weight) || 70;
@@ -113,8 +116,27 @@ const SettingsScreen = () => {
     } else {
       await cancelAllReminders();
     }
-    
+    // Persist settings explicitly to AsyncStorage to ensure they're saved
+    try {
+      await AsyncStorage.multiSet([
+        ['@glup_userName', userName],
+        ['@glup_dailyGoal', String(newGoal)],
+        ['@glup_weight', weight],
+        ['@glup_gender', gender],
+        ['@glup_activityLevel', activityLevel],
+        ['@glup_climate', climate],
+        ['@glup_wakeTime', wakeTime],
+        ['@glup_sleepTime', sleepTime],
+        ['@glup_reminderEnabled', String(reminderEnabled)],
+        ['@glup_soundEnabled', String(soundEnabled)],
+        ['@glup_soundType', soundType]
+      ]);
+    } catch (e) {
+      console.log('Error saving settings:', e);
+    }
+
     Alert.alert(getTranslation('configSaved', language), getTranslation('settingsSaved', language));
+    setIsDirty(false);
   };
 
   const clearAllData = () => {
@@ -186,11 +208,46 @@ const SettingsScreen = () => {
             setSoundEnabled(true);
             setSoundType('glup');
             Alert.alert(getTranslation('configRestored', language), getTranslation('defaultsRestored', language));
+            setIsDirty(true);
           }
         }
       ]
     );
   };
+
+  // Prevent leaving screen with unsaved changes
+  useEffect(() => {
+    if (!navigation) return;
+    const beforeRemove = (e: any) => {
+      if (!isDirty) return;
+      e.preventDefault();
+      Alert.alert(
+        language === 'en' ? 'Unsaved changes' : 'Cambios sin guardar',
+        language === 'en' ? 'You have unsaved changes. Discard them and leave the screen?' : 'Tienes cambios sin guardar. ¿Descartar y salir?',
+        [
+          { text: language === 'en' ? 'Keep editing' : 'Seguir editando', style: 'cancel', onPress: () => {} },
+          { text: language === 'en' ? 'Discard' : 'Descartar', style: 'destructive', onPress: () => navigation.dispatch(e.data.action) }
+        ]
+      );
+    };
+
+    const unsub = navigation.addListener('beforeRemove', beforeRemove);
+    // Also warn on tab changes (blur) — re-open settings if user chooses to stay
+    const onBlur = () => {
+      if (!isDirty) return;
+      Alert.alert(
+        language === 'en' ? 'Unsaved changes' : 'Cambios sin guardar',
+        language === 'en' ? 'You have unsaved changes. Discard them or go back to continue editing?' : 'Tienes cambios sin guardar. ¿Descartar o volver para seguir editando?',
+        [
+          { text: language === 'en' ? 'Discard' : 'Descartar', style: 'destructive', onPress: () => setIsDirty(false) },
+          { text: language === 'en' ? 'Keep editing' : 'Seguir editando', style: 'cancel', onPress: () => navigation.navigate('Settings') }
+        ]
+      );
+    };
+
+    const unsubBlur = navigation.addListener('blur', onBlur);
+    return () => { unsub(); unsubBlur(); };
+  }, [navigation, isDirty, language]);
 
   return (
     <ScrollView style={styles.container}>
@@ -203,7 +260,7 @@ const SettingsScreen = () => {
           <TextInput 
             style={styles.input} 
             value={userName} 
-            onChangeText={setUserName}
+            onChangeText={(v) => { setUserName(v); setIsDirty(true); }}
             placeholder={getTranslation('yourName', language)}
             maxLength={20}
           />
@@ -214,7 +271,7 @@ const SettingsScreen = () => {
           <View style={styles.pickerContainer}>
             <Picker
               selectedValue={gender}
-              onValueChange={setGender}
+              onValueChange={(v) => { setGender(v); setIsDirty(true); }}
               style={styles.picker}
             >
               <Picker.Item label={getTranslation('male', language)} value="male" />
@@ -229,7 +286,7 @@ const SettingsScreen = () => {
           <TextInput 
             style={styles.input} 
             value={weight} 
-            onChangeText={setWeight}
+            onChangeText={(v) => { setWeight(v); setIsDirty(true); }}
             placeholder="70"
             keyboardType="numeric"
           />
@@ -246,7 +303,7 @@ const SettingsScreen = () => {
             <TextInput 
               style={[styles.input, {flex: 1}]} 
               value={goalText} 
-              onChangeText={setGoalText}
+              onChangeText={(v) => { setGoalText(v); setIsDirty(true); }}
               placeholder="2.5"
               keyboardType="decimal-pad"
             />
@@ -255,6 +312,7 @@ const SettingsScreen = () => {
               onPress={() => {
                 const calculated = calculateDailyGoal();
                 setGoalText(String(calculated));
+                setIsDirty(true);
               }}
             >
               <Text style={styles.calculateText}>📊</Text>
@@ -267,7 +325,7 @@ const SettingsScreen = () => {
           <View style={styles.pickerContainer}>
             <Picker
               selectedValue={activityLevel}
-              onValueChange={setActivityLevel}
+              onValueChange={(v) => { setActivityLevel(v); setIsDirty(true); }}
               style={styles.picker}
             >
               <Picker.Item label={getTranslation('lowActivity', language)} value="low" />
@@ -282,7 +340,7 @@ const SettingsScreen = () => {
           <View style={styles.pickerContainer}>
             <Picker
               selectedValue={climate}
-              onValueChange={setClimate}
+              onValueChange={(v) => { setClimate(v); setIsDirty(true); }}
               style={styles.picker}
             >
               <Picker.Item label={getTranslation('coldClimate', language)} value="cold" />
@@ -302,7 +360,7 @@ const SettingsScreen = () => {
           <View style={styles.pickerContainer}>
             <Picker
               selectedValue={reminderEnabled}
-              onValueChange={setReminderEnabled}
+              onValueChange={(v) => { setReminderEnabled(v); setIsDirty(true); }}
               style={styles.picker}
             >
               <Picker.Item label={getTranslation('enabled', language)} value={true} />
@@ -316,7 +374,7 @@ const SettingsScreen = () => {
           <TextInput 
             style={styles.input} 
             value={wakeTime} 
-            onChangeText={setWakeTime}
+            onChangeText={(v) => { setWakeTime(v); setIsDirty(true); }}
             placeholder="07:00"
           />
         </View>
@@ -326,7 +384,7 @@ const SettingsScreen = () => {
           <TextInput 
             style={styles.input} 
             value={sleepTime} 
-            onChangeText={setSleepTime}
+            onChangeText={(v) => { setSleepTime(v); setIsDirty(true); }}
             placeholder="22:00"
           />
         </View>
@@ -336,7 +394,7 @@ const SettingsScreen = () => {
           <View style={styles.pickerContainer}>
             <Picker
               selectedValue={soundEnabled}
-              onValueChange={setSoundEnabled}
+              onValueChange={(v) => { setSoundEnabled(v); setIsDirty(true); }}
               style={styles.picker}
             >
               <Picker.Item label={getTranslation('enabled', language)} value={true} />
@@ -350,7 +408,7 @@ const SettingsScreen = () => {
           <View style={styles.pickerContainer}>
             <Picker
               selectedValue={soundType}
-              onValueChange={setSoundType}
+              onValueChange={(v) => { setSoundType(v); setIsDirty(true); }}
               style={styles.picker}
             >
               <Picker.Item label={getTranslation('classicGlup', language)} value="glup" />
@@ -376,7 +434,7 @@ const SettingsScreen = () => {
           <View style={styles.pickerContainer}>
             <Picker
               selectedValue={progressUnit}
-              onValueChange={setProgressUnit}
+              onValueChange={(v) => { setProgressUnit(v); setIsDirty(true); }}
               style={styles.picker}
             >
               <Picker.Item label={getTranslation('liters', language)} value="l" />
@@ -390,7 +448,7 @@ const SettingsScreen = () => {
           <View style={styles.pickerContainer}>
             <Picker
               selectedValue={glassUnit}
-              onValueChange={setGlassUnit}
+              onValueChange={(v) => { setGlassUnit(v); setIsDirty(true); }}
               style={styles.picker}
             >
               <Picker.Item label={getTranslation('mlGlass', language)} value="ml" />
@@ -404,7 +462,7 @@ const SettingsScreen = () => {
           <View style={styles.pickerContainer}>
             <Picker
               selectedValue={language}
-              onValueChange={setLanguage}
+              onValueChange={(v) => { setLanguage(v); setIsDirty(true); }}
               style={styles.picker}
             >
               <Picker.Item label={getTranslation('spanish', language)} value="es" />
@@ -416,6 +474,8 @@ const SettingsScreen = () => {
 
       {/* Botones de acción */}
       <View style={styles.actions}>
+        {/* debug buttons removed */}
+
         <TouchableOpacity style={styles.saveBtn} onPress={saveSettings}>
           <Text style={styles.saveText}>💾 {getTranslation('saveChanges', language)}</Text>
         </TouchableOpacity>
@@ -427,6 +487,8 @@ const SettingsScreen = () => {
         <TouchableOpacity style={styles.resetBtn} onPress={resetSettings}>
           <Text style={styles.resetText}>🔄 {getTranslation('restoreDefault', language)}</Text>
         </TouchableOpacity>
+        
+        {/* debug buttons removed */}
       </View>
     </ScrollView>
   );
