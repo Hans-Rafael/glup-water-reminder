@@ -21,6 +21,7 @@ DerivedData
 
 # Android
 *.apk
+!releases/*.apk
 *.ap_
 *.dex
 *.class
