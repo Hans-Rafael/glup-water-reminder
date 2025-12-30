@@ -30,6 +30,7 @@ type ContextType = {
   setSoundType: (type: string) => void;
   isFirstTime: boolean;
   setIsFirstTime: (value: boolean) => void;
+  isLoading: boolean;
   wakeTime: string;
   setWakeTime: (time: string) => void;
   sleepTime: string;
@@ -61,7 +62,8 @@ export const DrinkProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [language, setLanguage] = useState<string>('es');
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [soundType, setSoundType] = useState<string>('glup');
-  const [isFirstTime, setIsFirstTime] = useState<boolean>(true);
+  const [isFirstTime, setIsFirstTime] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [wakeTime, setWakeTime] = useState<string>('07:00');
   const [sleepTime, setSleepTime] = useState<string>('22:00');
   const [reminderEnabled, setReminderEnabled] = useState<boolean>(true);
@@ -101,7 +103,12 @@ export const DrinkProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (sDrinks) setDrinks(JSON.parse(sDrinks));
         if (sGoal) setDailyGoal(parseFloat(sGoal));
         if (sGlass) setCurrentGlassSize(parseFloat(sGlass));
-        if (sFirstTime !== null) setIsFirstTime(sFirstTime === 'true');
+        if (sFirstTime !== null) {
+          setIsFirstTime(sFirstTime === 'true');
+        } else {
+          // Si no existe el valor en AsyncStorage, es primera vez
+          setIsFirstTime(true);
+        }
         
         // Cargar configuraciones de usuario
         const sUserName = await AsyncStorage.getItem('@glup_userName');
@@ -130,8 +137,10 @@ export const DrinkProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (sGender) setGender(sGender);
         if (sActivityLevel) setActivityLevel(sActivityLevel);
         if (sClimate) setClimate(sClimate);
+        
+        setIsLoading(false);
       } catch (e) {
-        // ignore
+        setIsLoading(false);
       }
     })();
   }, []);
@@ -200,11 +209,11 @@ export const DrinkProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     dailyGoal, setDailyGoal, lastAdded,
     userName, setUserName, language, setLanguage,
     soundEnabled, setSoundEnabled, soundType, setSoundType,
-    isFirstTime, setIsFirstTime, wakeTime, setWakeTime,
+    isFirstTime, setIsFirstTime, isLoading, wakeTime, setWakeTime,
     sleepTime, setSleepTime, reminderEnabled, setReminderEnabled,
     setDrinks, weight, setWeight, gender, setGender,
     activityLevel, setActivityLevel, climate, setClimate
-  }), [drinks, currentGlassSize, dailyGoal, lastAdded, userName, language, soundEnabled, soundType, isFirstTime, wakeTime, sleepTime, reminderEnabled, weight, gender, activityLevel, climate]);
+  }), [drinks, currentGlassSize, dailyGoal, lastAdded, userName, language, soundEnabled, soundType, isFirstTime, isLoading, wakeTime, sleepTime, reminderEnabled, weight, gender, activityLevel, climate]);
 
   return <DrinkContext.Provider value={value}>{children}</DrinkContext.Provider>;
 };
