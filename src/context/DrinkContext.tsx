@@ -35,7 +35,17 @@ type ContextType = {
   sleepTime: string;
   setSleepTime: (time: string) => void;
   reminderEnabled: boolean;
+  setReminderEnabled: (enabled: boolean) => void;
   setDrinks: (drinks: Drink[]) => void;
+  // Datos del perfil
+  weight: string;
+  setWeight: (weight: string) => void;
+  gender: string;
+  setGender: (gender: string) => void;
+  activityLevel: string;
+  setActivityLevel: (level: string) => void;
+  climate: string;
+  setClimate: (climate: string) => void;
 };
 
 export const DrinkContext = createContext<ContextType | null>(null);
@@ -55,6 +65,12 @@ export const DrinkProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [wakeTime, setWakeTime] = useState<string>('07:00');
   const [sleepTime, setSleepTime] = useState<string>('22:00');
   const [reminderEnabled, setReminderEnabled] = useState<boolean>(true);
+  
+  // Datos del perfil
+  const [weight, setWeight] = useState<string>('70');
+  const [gender, setGender] = useState<string>('male');
+  const [activityLevel, setActivityLevel] = useState<string>('low');
+  const [climate, setClimate] = useState<string>('temperate');
 
   const addDrink = (amount: number) => {
     const now = new Date();
@@ -96,6 +112,12 @@ export const DrinkProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         const sSleepTime = await AsyncStorage.getItem('@glup_sleepTime');
         const sReminderEnabled = await AsyncStorage.getItem('@glup_reminderEnabled');
         
+        // Cargar datos del perfil
+        const sWeight = await AsyncStorage.getItem('@glup_weight');
+        const sGender = await AsyncStorage.getItem('@glup_gender');
+        const sActivityLevel = await AsyncStorage.getItem('@glup_activityLevel');
+        const sClimate = await AsyncStorage.getItem('@glup_climate');
+        
         if (sUserName) setUserName(sUserName);
         if (sLanguage) setLanguage(sLanguage);
         if (sSoundEnabled !== null) setSoundEnabled(sSoundEnabled === 'true');
@@ -103,6 +125,11 @@ export const DrinkProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (sWakeTime) setWakeTime(sWakeTime);
         if (sSleepTime) setSleepTime(sSleepTime);
         if (sReminderEnabled !== null) setReminderEnabled(sReminderEnabled === 'true');
+        
+        if (sWeight) setWeight(sWeight);
+        if (sGender) setGender(sGender);
+        if (sActivityLevel) setActivityLevel(sActivityLevel);
+        if (sClimate) setClimate(sClimate);
       } catch (e) {
         // ignore
       }
@@ -131,6 +158,20 @@ export const DrinkProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     AsyncStorage.setItem('@glup_reminderEnabled', String(reminderEnabled)).catch(() => {});
   }, [reminderEnabled]);
+  
+  // Guardar datos del perfil
+  useEffect(() => {
+    AsyncStorage.setItem('@glup_weight', weight).catch(() => {});
+  }, [weight]);
+  useEffect(() => {
+    AsyncStorage.setItem('@glup_gender', gender).catch(() => {});
+  }, [gender]);
+  useEffect(() => {
+    AsyncStorage.setItem('@glup_activityLevel', activityLevel).catch(() => {});
+  }, [activityLevel]);
+  useEffect(() => {
+    AsyncStorage.setItem('@glup_climate', climate).catch(() => {});
+  }, [climate]);
 
   // Save when relevant values change
   useEffect(() => {
@@ -161,8 +202,9 @@ export const DrinkProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     soundEnabled, setSoundEnabled, soundType, setSoundType,
     isFirstTime, setIsFirstTime, wakeTime, setWakeTime,
     sleepTime, setSleepTime, reminderEnabled, setReminderEnabled,
-    setDrinks
-  }), [drinks, currentGlassSize, dailyGoal, lastAdded, userName, language, soundEnabled, soundType, isFirstTime, wakeTime, sleepTime, reminderEnabled]);
+    setDrinks, weight, setWeight, gender, setGender,
+    activityLevel, setActivityLevel, climate, setClimate
+  }), [drinks, currentGlassSize, dailyGoal, lastAdded, userName, language, soundEnabled, soundType, isFirstTime, wakeTime, sleepTime, reminderEnabled, weight, gender, activityLevel, climate]);
 
   return <DrinkContext.Provider value={value}>{children}</DrinkContext.Provider>;
 };

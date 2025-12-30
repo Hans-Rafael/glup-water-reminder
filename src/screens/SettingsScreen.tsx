@@ -14,22 +14,29 @@ const SettingsScreen = () => {
     userName: 'Usuario', setUserName: (_: string) => {},
     language: 'es', setLanguage: (_: string) => {},
     soundEnabled: true, setSoundEnabled: (_: boolean) => {},
-    soundType: 'glup', setSoundType: (_: string) => {}
+    soundType: 'glup', setSoundType: (_: string) => {},
+    wakeTime: '07:00', setWakeTime: (_: string) => {},
+    sleepTime: '22:00', setSleepTime: (_: string) => {},
+    reminderEnabled: true, setReminderEnabled: (_: boolean) => {},
+    drinks: [], setDrinks: (_: any[]) => {},
+    weight: '70', setWeight: (_: string) => {},
+    gender: 'male', setGender: (_: string) => {},
+    activityLevel: 'low', setActivityLevel: (_: string) => {},
+    climate: 'temperate', setClimate: (_: string) => {}
   };
   const { 
     dailyGoal, setDailyGoal, userName, setUserName, 
     language, setLanguage, soundEnabled, setSoundEnabled,
     soundType, setSoundType, wakeTime, setWakeTime,
     sleepTime, setSleepTime, reminderEnabled, setReminderEnabled,
-    drinks, setDrinks
+    drinks, setDrinks, weight, setWeight, gender, setGender,
+    activityLevel, setActivityLevel, climate, setClimate
   } = ctx || fallback;
   
   // Estados locales para configuraciones
-  const [gender, setGender] = useState('male');
-  const [weight, setWeight] = useState('70');
   const [goalText, setGoalText] = useState(String(dailyGoal));
-  const [activityLevel, setActivityLevel] = useState('low');
-  const [climate, setClimate] = useState('temperate');
+  const [progressUnit, setProgressUnit] = useState('l');
+  const [glassUnit, setGlassUnit] = useState('ml');
 
   const calculateDailyGoal = () => {
     const weightNum = parseFloat(weight) || 70;
@@ -132,7 +139,11 @@ const SettingsScreen = () => {
                 '@glup_soundType',
                 '@glup_wakeTime',
                 '@glup_sleepTime',
-                '@glup_reminderEnabled'
+                '@glup_reminderEnabled',
+                '@glup_weight',
+                '@glup_gender',
+                '@glup_activityLevel',
+                '@glup_climate'
               ]);
               
               setDrinks([]);

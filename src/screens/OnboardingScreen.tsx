@@ -46,6 +46,10 @@ const OnboardingScreen = ({ onComplete }: { onComplete: () => void }) => {
     if (ctx) {
       ctx.setUserName(name || 'Usuario');
       ctx.setDailyGoal(goal);
+      ctx.setWeight(weight);
+      ctx.setGender(gender);
+      ctx.setActivityLevel(activityLevel);
+      ctx.setClimate(climate);
     }
     onComplete();
   };
