@@ -10,10 +10,7 @@ import OnboardingScreen from './src/screens/OnboardingScreen';
 function AppContent() {
   const ctx = useContext(DrinkContext);
   
-  // TEMPORAL: Descomenta para limpiar datos y probar onboarding
-  useEffect(() => {
-    AsyncStorage.removeItem('@glup_firstTime');
-  }, []);
+  console.log("App state - isLoading:", ctx?.isLoading, "isFirstTime:", ctx?.isFirstTime);
   
   if (ctx?.isLoading) {
     return (

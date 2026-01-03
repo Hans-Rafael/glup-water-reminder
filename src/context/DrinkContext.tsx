@@ -117,13 +117,13 @@ export const DrinkProvider: React.FC<{ children: React.ReactNode }> = ({
         if (sDrinks) setDrinks(JSON.parse(sDrinks));
         if (sGoal) setDailyGoal(parseFloat(sGoal));
         if (sGlass) setCurrentGlassSize(parseFloat(sGlass));
-        if (sFirstTime !== null) {
-          console.log("Setting isFirstTime to:", sFirstTime === "true");
-          setIsFirstTime(sFirstTime === "true");
-        } else {
+        if (sFirstTime === null) {
           // Si no existe el valor en AsyncStorage, es primera vez
           console.log("No sFirstTime found, setting to true");
           setIsFirstTime(true);
+        } else {
+          console.log("Setting isFirstTime to:", sFirstTime === "true");
+          setIsFirstTime(sFirstTime === "true");
         }
 
         // Cargar configuraciones de usuario
@@ -239,11 +239,11 @@ export const DrinkProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [currentGlassSize, isLoading]);
 
   useEffect(() => {
-    // Always persist firstTime changes (so onboarding state is kept)
-    AsyncStorage.setItem("@glup_firstTime", String(isFirstTime)).catch(
-      () => {}
-    );
-  }, [isFirstTime]);
+    // Solo guardar firstTime cuando NO es loading y NO es primera vez
+    if (!isLoading && !isFirstTime) {
+      AsyncStorage.setItem("@glup_firstTime", "false").catch(() => {});
+    }
+  }, [isFirstTime, isLoading]);
 
   // Programar notificaciones cuando cambien configuraciones
   useEffect(() => {
