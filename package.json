@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "EXPO_NO_REDIRECT_PAGE=true BROWSER=none expo start",
-    "android": "EXPO_NO_REDIRECT_PAGE=true BROWSER=none expo start --android",
-    "ios": "EXPO_NO_REDIRECT_PAGE=true BROWSER=none expo start --ios",
+    "start": "EXPO_NO_REDIRECT_PAGE=true BROWSER=none expo start --no-dev",
+    "android": "EXPO_NO_REDIRECT_PAGE=true BROWSER=none expo start --android --no-dev",
+    "ios": "EXPO_NO_REDIRECT_PAGE=true BROWSER=none expo start --ios --no-dev",
     "web": "EXPO_NO_REDIRECT_PAGE=true BROWSER=none expo start --web"
   },
   "dependencies": {

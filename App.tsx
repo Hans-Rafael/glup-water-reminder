@@ -1,6 +1,7 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { registerRootComponent } from 'expo';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppNavigator from './src/navigation/AppNavigator';
 import { DrinkProvider } from './src/context/DrinkContext';
 import DrinkContext from './src/context/DrinkContext';
@@ -8,6 +9,11 @@ import OnboardingScreen from './src/screens/OnboardingScreen';
 
 function AppContent() {
   const ctx = useContext(DrinkContext);
+  
+  // TEMPORAL: Descomenta para limpiar datos y probar onboarding
+  useEffect(() => {
+    AsyncStorage.removeItem('@glup_firstTime');
+  }, []);
   
   if (ctx?.isLoading) {
     return (

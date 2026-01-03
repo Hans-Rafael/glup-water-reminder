@@ -25,6 +25,8 @@
       "eas": {
         "projectId": "d0634610-10be-406a-b2a5-a563b86cb5e4"
       }
-    }
+    },
+    "scheme": "waterreminderapp",
+    "owner": "hansvekoni"
   }
 }
