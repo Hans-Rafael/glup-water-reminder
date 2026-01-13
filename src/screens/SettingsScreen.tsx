@@ -8,6 +8,7 @@ import {
   ScrollView,
   Alert,
   Vibration,
+  ActivityIndicator,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { useNavigation } from "@react-navigation/native";
@@ -86,6 +87,7 @@ const SettingsScreen = () => {
   const [progressUnit, setProgressUnit] = useState("l");
   const [glassUnit, setGlassUnit] = useState("ml");
   const [isDirty, setIsDirty] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const navigation = useNavigation();
 
   const calculateDailyGoal = () => {
@@ -154,26 +156,29 @@ const SettingsScreen = () => {
   };
 
   const saveSettings = async () => {
-    // Siempre recalcular la meta basada en los parámetros actuales
-    const calculatedGoal = calculateDailyGoal();
+    setIsSaving(true);
     
-    setDailyGoal(calculatedGoal);
-    setGoalText(String(calculatedGoal));
-
-    // Reprogramar notificaciones con nueva configuración
-    if (reminderEnabled) {
-      await scheduleWaterReminders(
-        wakeTime,
-        sleepTime,
-        calculatedGoal,
-        currentGlassSize || 0.2,
-        language
-      );
-    } else {
-      await cancelAllReminders();
-    }
-    // Persist settings explicitly to AsyncStorage to ensure they're saved
     try {
+      // Siempre recalcular la meta basada en los parámetros actuales
+      const calculatedGoal = calculateDailyGoal();
+      
+      setDailyGoal(calculatedGoal);
+      setGoalText(String(calculatedGoal));
+
+      // Reprogramar notificaciones con nueva configuración
+      if (reminderEnabled) {
+        await scheduleWaterReminders(
+          wakeTime,
+          sleepTime,
+          calculatedGoal,
+          currentGlassSize || 0.2,
+          language
+        );
+      } else {
+        await cancelAllReminders();
+      }
+      
+      // Persist settings explicitly to AsyncStorage to ensure they're saved
       await AsyncStorage.multiSet([
         ["@glup_userName", userName],
         ["@glup_dailyGoal", String(calculatedGoal)],
@@ -187,15 +192,21 @@ const SettingsScreen = () => {
         ["@glup_soundEnabled", String(soundEnabled)],
         ["@glup_soundType", soundType],
       ]);
+
+      Alert.alert(
+        getTranslation("configSaved", language),
+        getTranslation("settingsSaved", language)
+      );
+      setIsDirty(false);
     } catch (e) {
       console.log("Error saving settings:", e);
+      Alert.alert(
+        "Error",
+        "No se pudieron guardar los cambios"
+      );
+    } finally {
+      setIsSaving(false);
     }
-
-    Alert.alert(
-      getTranslation("configSaved", language),
-      getTranslation("settingsSaved", language)
-    );
-    setIsDirty(false);
   };
 
   const clearAllData = () => {
@@ -707,11 +718,22 @@ const SettingsScreen = () => {
       <View style={styles.actions}>
         {/* debug buttons removed */}
 
-        <TouchableOpacity style={styles.saveBtn} onPress={saveSettings}>
+        <TouchableOpacity 
+          style={[styles.saveBtn, isSaving && styles.saveBtnDisabled]} 
+          onPress={saveSettings}
+          disabled={isSaving}
+        >
           <Text style={styles.saveText}>
-            💾 {getTranslation("saveChanges", language)}
+            {isSaving ? "💾 Guardando..." : `💾 ${getTranslation("saveChanges", language)}`}
           </Text>
         </TouchableOpacity>
+
+        {/* Spinner flotante */}
+        {isSaving && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="large" color="#2196F3" />
+          </View>
+        )}
 
         <TouchableOpacity style={styles.clearBtn} onPress={clearAllData}>
           <Text style={styles.clearText}>
@@ -793,6 +815,21 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     fontSize: 16,
+  },
+  saveBtnDisabled: {
+    backgroundColor: "#90CAF9",
+    opacity: 0.7,
+  },
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000,
   },
   clearBtn: {
     backgroundColor: "#f44336",
