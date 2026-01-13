@@ -18,6 +18,18 @@
 - 🔊 **Sonidos personalizables** - Glup clásico, gotas de agua o burbujas
 - 🌍 **Bilingüe** - Español e Inglés
 - 💡 **Tips de hidratación** - Consejos prácticos para mantenerte saludable
+- 🎯 **Onboarding inteligente** - Configuración inicial personalizada para nuevos usuarios
+- ⚡ **Auto-cálculo de metas** - Actualización automática basada en tu perfil
+- 💾 **Guardado inteligente** - Feedback visual durante operaciones de guardado
+
+## 🎆 Novedades v1.1.0
+
+- ✅ **Pantalla de onboarding para nuevos usuarios** - Configuración inicial personalizada
+- ✅ **Cálculo automático de meta diaria** - Basado en peso, género, actividad y clima
+- ✅ **Auto-actualización de meta en configuración** - Recalcula automáticamente al cambiar parámetros
+- ✅ **Spinner de carga al guardar cambios** - Feedback visual durante operaciones
+- ✅ **Mejor UX en configuración** - Interfaz mejorada y más intuitiva
+- ✅ **Configuración de builds para producción** - Optimizaciones para APK final
 
 ## 🛠️ Tecnologías Utilizadas
 
