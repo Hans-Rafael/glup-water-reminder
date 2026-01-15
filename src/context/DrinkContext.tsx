@@ -109,12 +109,49 @@ export const DrinkProvider: React.FC<{ children: React.ReactNode }> = ({
     (async () => {
       try {
         await registerForPushNotificationsAsync();
+        
+        // Verificar si es un nuevo día
+        const sLastDate = await AsyncStorage.getItem("@glup_lastDate");
+        const today = new Date().toDateString();
+        
         const sDrinks = await AsyncStorage.getItem("@glup_drinks");
         const sGoal = await AsyncStorage.getItem("@glup_dailyGoal");
         const sGlass = await AsyncStorage.getItem("@glup_glassSize");
         const sFirstTime = await AsyncStorage.getItem("@glup_firstTime");
         console.log("sFirstTime from storage:", sFirstTime);
-        if (sDrinks) setDrinks(JSON.parse(sDrinks));
+        
+        // Si es un nuevo día, guardar historial y resetear drinks
+        if (sLastDate && sLastDate !== today && sDrinks) {
+          console.log("New day detected, saving history and resetting drinks");
+          
+          // Guardar el día anterior en el historial
+          const currentDrinks = JSON.parse(sDrinks);
+          if (currentDrinks.length > 0) {
+            const sHistory = await AsyncStorage.getItem("@glup_history");
+            const history = sHistory ? JSON.parse(sHistory) : [];
+            
+            // Agregar el día anterior al historial
+            history.push({
+              date: sLastDate,
+              drinks: currentDrinks,
+              total: currentDrinks.reduce((sum, d) => sum + d.amount, 0)
+            });
+            
+            // Mantener solo los últimos 30 días
+            const recentHistory = history.slice(-30);
+            await AsyncStorage.setItem("@glup_history", JSON.stringify(recentHistory));
+          }
+          
+          // Resetear drinks del día actual
+          setDrinks([]);
+          await AsyncStorage.setItem("@glup_drinks", JSON.stringify([]));
+        } else if (sDrinks) {
+          setDrinks(JSON.parse(sDrinks));
+        }
+        
+        // Guardar la fecha actual
+        await AsyncStorage.setItem("@glup_lastDate", today);
+        
         if (sGoal) setDailyGoal(parseFloat(sGoal));
         if (sGlass) setCurrentGlassSize(parseFloat(sGlass));
         if (sFirstTime === null) {

@@ -1,5 +1,6 @@
 import React, { useContext, useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ScrollView } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import DrinkContext from '../context/DrinkContext';
 import { getTranslation } from '../utils/translations';
 
@@ -8,6 +9,21 @@ const HistorialScreen = () => {
   const fallback = { drinks: [] as any, deleteDrink: (_: number) => {}, dailyGoal: 2.5, language: 'es' };
   const { drinks, deleteDrink, dailyGoal, language } = ctx || fallback;
   const [currentPeriod, setCurrentPeriod] = useState('today');
+  const [history, setHistory] = useState([]);
+
+  // Cargar historial desde AsyncStorage
+  useEffect(() => {
+    (async () => {
+      try {
+        const sHistory = await AsyncStorage.getItem('@glup_history');
+        if (sHistory) {
+          setHistory(JSON.parse(sHistory));
+        }
+      } catch (e) {
+        console.log('Error loading history:', e);
+      }
+    })();
+  }, []);
 
   const generateWeeklyData = () => {
     const weekData = [];
@@ -15,19 +31,20 @@ const HistorialScreen = () => {
     
     for (let i = 6; i >= 0; i--) {
       const date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
-      const dayDrinks = drinks.filter(drink => {
-        if (!drink.date) {
-          return i === 0; // Solo incluir en el día de hoy si no tiene fecha
-        }
-        
-        const drinkDate = new Date(drink.date);
-        const isSameDay = drinkDate.getFullYear() === date.getFullYear() &&
-                         drinkDate.getMonth() === date.getMonth() &&
-                         drinkDate.getDate() === date.getDate();
-        return isSameDay;
-      });
+      const dateStr = date.toDateString();
       
-      const dayTotal = dayDrinks.reduce((sum, drink) => sum + drink.amount, 0);
+      // Buscar en el historial
+      const historyDay = history.find(h => h.date === dateStr);
+      
+      let dayTotal = 0;
+      if (i === 0) {
+        // Hoy: usar drinks actuales
+        dayTotal = drinks.reduce((sum, drink) => sum + drink.amount, 0);
+      } else if (historyDay) {
+        // Días anteriores: usar historial
+        dayTotal = historyDay.total;
+      }
+      
       const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
       
       weekData.push({
@@ -39,11 +56,39 @@ const HistorialScreen = () => {
       });
     }
     
-    console.log('Weekly data generated:', weekData);
     return weekData;
   };
 
+  const generateMonthlyData = () => {
+    const monthData = [];
+    const today = new Date();
+    
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
+      const dateStr = date.toDateString();
+      
+      const historyDay = history.find(h => h.date === dateStr);
+      
+      let dayTotal = 0;
+      if (i === 0) {
+        dayTotal = drinks.reduce((sum, drink) => sum + drink.amount, 0);
+      } else if (historyDay) {
+        dayTotal = historyDay.total;
+      }
+      
+      monthData.push({
+        day: date.getDate(),
+        consumed: dayTotal,
+        percentage: Math.round((dayTotal / dailyGoal) * 100),
+        achieved: dayTotal >= dailyGoal
+      });
+    }
+    
+    return monthData;
+  };
+
   const weeklyData = generateWeeklyData();
+  const monthlyData = generateMonthlyData();
   const total = drinks.reduce((s, d) => s + d.amount, 0);
   const progressPercentage = Math.round((total / dailyGoal) * 100);
 
@@ -81,7 +126,15 @@ const HistorialScreen = () => {
           onPress={() => setCurrentPeriod('week')}
         >
           <Text style={[styles.periodBtnText, currentPeriod === 'week' && styles.periodBtnTextActive]}>
-            {language === 'en' ? 'Last week' : 'Última semana'}
+            {language === 'en' ? '7 days' : '7 días'}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.periodBtn, currentPeriod === 'month' && styles.periodBtnActive]}
+          onPress={() => setCurrentPeriod('month')}
+        >
+          <Text style={[styles.periodBtnText, currentPeriod === 'month' && styles.periodBtnTextActive]}>
+            {language === 'en' ? '30 days' : '30 días'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -115,7 +168,9 @@ const HistorialScreen = () => {
         <Text style={styles.chartTitle}>
           {currentPeriod === 'today' 
             ? `📈 ${language === 'en' ? 'Hydration by hours' : 'Hidratación por horas'}`
-            : `📈 ${language === 'en' ? 'Weekly progress' : 'Progreso semanal'}`
+            : currentPeriod === 'week'
+            ? `📈 ${language === 'en' ? 'Last 7 days' : 'Últimos 7 días'}`
+            : `📈 ${language === 'en' ? 'Last 30 days' : 'Últimos 30 días'}`
           }
         </Text>
         <View style={styles.chartContainer}>
@@ -140,7 +195,7 @@ const HistorialScreen = () => {
                 </TouchableOpacity>
               );
             })
-          ) : (
+          ) : currentPeriod === 'week' ? (
             // Vista semanal por días
             weeklyData.map((dayData, i) => {
               const height = Math.min((dayData.consumed / dailyGoal) * 100, 100);
@@ -165,6 +220,31 @@ const HistorialScreen = () => {
                 </TouchableOpacity>
               );
             })
+          ) : (
+            // Vista mensual (30 días)
+            monthlyData.map((dayData, i) => {
+              const height = Math.min((dayData.consumed / dailyGoal) * 100, 100);
+              let barColor = '#e0e0e0';
+              if (dayData.consumed > 0) {
+                barColor = dayData.achieved ? '#4CAF50' : '#FF9800';
+              }
+              
+              return (
+                <TouchableOpacity 
+                  key={i} 
+                  style={styles.chartColumnWrapper} 
+                  onPress={() => setChartInfo(`Día ${dayData.day}: ${dayData.consumed.toFixed(1)}L - ${dayData.achieved ? '✓ Meta alcanzada' : dayData.percentage + '% completado'}`)}
+                >
+                  <View style={[
+                    styles.chartColumn, 
+                    { 
+                      height: `${Math.max(4, height)}%`, 
+                      backgroundColor: barColor
+                    }
+                  ]} />
+                </TouchableOpacity>
+              );
+            })
           )}
         </View>
         <View style={styles.chartLabels}>
@@ -175,14 +255,20 @@ const HistorialScreen = () => {
               <Text style={styles.chartLabel}>6PM</Text>
               <Text style={styles.chartLabel}>12AM</Text>
             </>
-          ) : (
+          ) : currentPeriod === 'week' ? (
             weeklyData.map((d, i) => (
               <Text key={i} style={styles.chartLabel}>{d.day}</Text>
             ))
+          ) : (
+            <>
+              <Text style={styles.chartLabel}>Día 1</Text>
+              <Text style={styles.chartLabel}>Día 15</Text>
+              <Text style={styles.chartLabel}>Día 30</Text>
+            </>
           )}
         </View>
         
-        {currentPeriod === 'week' && (
+        {currentPeriod !== 'today' && (
           <View style={styles.chartLegend}>
             <View style={styles.legendItem}>
               <View style={[styles.legendColor, { backgroundColor: '#4CAF50' }]} />
@@ -236,6 +322,9 @@ const HistorialScreen = () => {
           )}
         </View>
       )}
+      
+      {/* Espaciado final */}
+      <View style={{ height: 30 }} />
     </ScrollView>
   );
 };
@@ -453,8 +542,12 @@ const styles = StyleSheet.create({
   chartLegend: {
     flexDirection: 'row',
     justifyContent: 'center',
+    flexWrap: 'wrap',
     gap: 15,
-    marginTop: 8
+    marginTop: 12,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0'
   },
   legendItem: {
     flexDirection: 'row',
@@ -462,13 +555,14 @@ const styles = StyleSheet.create({
     gap: 4
   },
   legendColor: {
-    width: 8,
-    height: 8,
-    borderRadius: 2
+    width: 12,
+    height: 12,
+    borderRadius: 3
   },
   legendText: {
-    fontSize: 10,
-    color: '#666'
+    fontSize: 11,
+    color: '#666',
+    fontWeight: '500'
   }
 });
 
