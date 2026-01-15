@@ -30,6 +30,7 @@
 - ✅ **Spinner de carga al guardar cambios** - Feedback visual durante operaciones
 - ✅ **Mejor UX en configuración** - Interfaz mejorada y más intuitiva
 - ✅ **Configuración de builds para producción** - Optimizaciones para APK final
+- ✅ **Historial ampliado a 30 días** - Nueva opción para consultar el registro completo del último mes
 
 ## 🛠️ Tecnologías Utilizadas
 

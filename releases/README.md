@@ -70,6 +70,7 @@
 - Agregado: Cálculo automático de meta diaria basado en perfil del usuario
 - Mejorado: Auto-actualización de meta cuando se cambian parámetros en configuración
 - Agregado: Spinner de carga y feedback visual al guardar cambios
+- Agregado: Ahora el historial incluye una opción que muestra el registro completo de los últimos 30 días.
 - Mejorado: Experiencia de usuario en pantalla de configuración
 - Optimizado: Configuración de builds para producción
 
