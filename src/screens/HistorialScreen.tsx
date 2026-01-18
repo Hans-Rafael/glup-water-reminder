@@ -109,7 +109,7 @@ const HistorialScreen = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>{getTranslation('historial', language)}</Text>
+      <Text style={styles.title}>{language === 'en' ? 'Hydration Summary' : 'Resumen de hidratación'}</Text>
       
       {/* Selector de período */}
       <View style={styles.periodSelector}>
