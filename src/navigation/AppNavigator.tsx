@@ -8,6 +8,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useContext } from 'react';
 import DrinkContext from '../context/DrinkContext';
 import { getTranslation } from '../utils/translations';
+import { View, Text } from 'react-native';
 
 const Tab = createBottomTabNavigator();
 
@@ -44,6 +45,14 @@ const AppNavigator = () => {
           component={HomeScreen}
           options={{ 
             title: getTranslation('home', language),
+            headerTitle: () => (
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <MaterialIcons name="home" size={24} color="white" style={{ marginRight: 8 }} />
+                <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>
+                  {getTranslation('dailyHydration', language)}
+                </Text>
+              </View>
+            ),
             tabBarIcon: ({ color, size }) => <MaterialIcons name="home" size={28} color={color} /> 
           }}
         />

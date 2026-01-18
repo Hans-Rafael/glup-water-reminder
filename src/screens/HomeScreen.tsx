@@ -136,21 +136,19 @@ const HomeScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>{getTranslation('dailyHydration', language)}</Text>
+        <View style={styles.progressContainer}>
+          <Text style={styles.progressText}>{`${total.toFixed(1)}L / ${dailyGoal.toFixed(1)}L`}</Text>
+          <View style={styles.progressBar}>
+            <View style={[styles.progressFill, { width: `${percent * 100}%` }]} />
+          </View>
+          <Text style={styles.glassesText}>{`${drinks.length} / ${glassesNeeded} ${getTranslation('glasses', language)}`}</Text>
+        </View>
         <TouchableOpacity 
           style={styles.infoButton}
           onPress={() => setShowInfoModal(true)}
         >
           <Text style={styles.infoButtonText}>i</Text>
         </TouchableOpacity>
-      </View>
-      
-      <View style={styles.progressContainer}>
-        <Text style={styles.progressText}>{`${total.toFixed(1)}L / ${dailyGoal.toFixed(1)}L`}</Text>
-        <View style={styles.progressBar}>
-          <View style={[styles.progressFill, { width: `${percent * 100}%` }]} />
-        </View>
-        <Text style={styles.glassesText}>{`${drinks.length} / ${glassesNeeded} ${getTranslation('glasses', language)}`}</Text>
       </View>
 
       <View style={styles.controls}> 
@@ -186,6 +184,8 @@ const HomeScreen = () => {
       </View>
 
       <Text style={styles.motivationText}>{getMotivationText()}</Text>
+
+
       
       {/* Modal de Consejos de Hidratación */}
       <Modal
@@ -197,9 +197,12 @@ const HomeScreen = () => {
         <View style={styles.infoModalOverlay}>
           <View style={styles.infoModalCard}>
             <View style={styles.infoModalHeader}>
-              <Text style={styles.infoModalTitle}>
-                💧 {getTranslation('hydrationTips', language)}
-              </Text>
+              <View style={styles.infoModalTitleContainer}>
+                <Text style={styles.infoModalEmoji}>💧</Text>
+                <Text style={styles.infoModalTitle}>
+                  {getTranslation('hydrationTips', language)}
+                </Text>
+              </View>
               <TouchableOpacity 
                 style={styles.infoCloseButton}
                 onPress={() => setShowInfoModal(false)}
@@ -288,9 +291,13 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     width: '100%',
     marginBottom: 40
+  },
+  homeEmoji: {
+    fontSize: 24,
+    marginRight: 10
   },
   title: {
     fontSize: 28,
@@ -320,8 +327,8 @@ const styles = StyleSheet.create({
   },
   progressContainer: { 
     alignItems: 'center', 
-    marginBottom: 60,
-    width: '100%'
+    flex: 1,
+    marginRight: 15
   },
   progressText: { 
     fontSize: 24, 
@@ -491,11 +498,20 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0'
   },
+  infoModalTitleContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center'
+  },
+  infoModalEmoji: {
+    fontSize: 24,
+    marginBottom: 5
+  },
   infoModalTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#2196F3',
-    flex: 1
+    textAlign: 'center'
   },
   infoCloseButton: {
     width: 30,
