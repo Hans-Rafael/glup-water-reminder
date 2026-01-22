@@ -121,6 +121,9 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo [LICENSE](LICENSE) para
 
 **Hans Rafael** - [@Hans-Rafael](https://github.com/Hans-Rafael)
 
+## **Linkedin:** - [hans-developer](https://www.linkedin.com/in/hans-developer/)
+
+
 ---
 
 <div align="center">
